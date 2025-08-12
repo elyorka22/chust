@@ -28,11 +28,9 @@ interface FormData {
   rooms: string;
   floor: string;
   total_floors: string;
-  address: string;
   latitude: number;
   longitude: number;
   contact_phone: string;
-  contact_email: string;
   category: 'rent' | 'sale';
 }
 
@@ -50,11 +48,9 @@ export default function AddListingPage() {
     rooms: '',
     floor: '',
     total_floors: '',
-    address: '',
     latitude: 40.9977, // Default Chust coordinates
     longitude: 71.2374,
     contact_phone: '',
-    contact_email: '',
     category: 'rent'
   });
 
@@ -76,7 +72,7 @@ export default function AddListingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.price || !formData.address) {
+    if (!formData.title || !formData.price || !formData.contact_phone) {
       showAlert('Iltimos, barcha majburiy maydonlarni to\'ldiring');
       return;
     }
@@ -300,28 +296,6 @@ export default function AddListingPage() {
             </div>
           </div>
 
-          {/* Address */}
-          <div className="bg-white rounded-lg p-4 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">Manzil</h2>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                To&apos;liq manzil *
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Masalan: Navoiy ko&apos;chasi, 15, Chust"
-                  required
-                />
-                <MapPin className="absolute left-3 top-2.5 text-gray-400" size={16} />
-              </div>
-            </div>
-          </div>
-
           {/* Location Picker */}
           <LocationPicker
             onLocationSelect={handleLocationSelect}
@@ -335,7 +309,7 @@ export default function AddListingPage() {
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Telefon raqam
+                Telefon raqam *
               </label>
               <input
                 type="tel"
@@ -343,19 +317,7 @@ export default function AddListingPage() {
                 onChange={(e) => handleInputChange('contact_phone', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="+998 90 123 45 67"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                value={formData.contact_email}
-                onChange={(e) => handleInputChange('contact_email', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="example@email.com"
+                required
               />
             </div>
           </div>

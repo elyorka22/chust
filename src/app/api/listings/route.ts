@@ -139,9 +139,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Validate required fields
-    if (!body.title || !body.price || !body.address) {
+    if (!body.title || !body.price || !body.contact_phone) {
       return NextResponse.json(
-        { error: 'Missing required fields: title, price, address' },
+        { error: 'Missing required fields: title, price, contact_phone' },
         { status: 400 }
       );
     }
@@ -199,11 +199,11 @@ export async function POST(request: NextRequest) {
         rooms: body.rooms ? parseInt(body.rooms) : null,
         floor: body.floor ? parseInt(body.floor) : null,
         total_floors: body.total_floors ? parseInt(body.total_floors) : null,
-        address: body.address,
+        address: `Lat: ${body.latitude}, Lng: ${body.longitude}`, // Use coordinates as address
         latitude: body.latitude || 40.9977, // Use selected coordinates or default
         longitude: body.longitude || 71.2374,
         contact_phone: body.contact_phone,
-        contact_email: body.contact_email,
+        contact_email: null, // No email field anymore
         category_id: category.id,
         user_id: 'demo_user', // TODO: Get from authenticated user
         is_active: true
