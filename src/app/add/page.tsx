@@ -55,6 +55,7 @@ export default function AddListingPage() {
   });
 
   const handleInputChange = (field: keyof FormData, value: string | number) => {
+    console.log(`Updating field ${field} with value:`, value);
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -72,7 +73,10 @@ export default function AddListingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form data:', formData);
+    
     if (!formData.title || !formData.price || !formData.contact_phone) {
+      console.log('Validation failed:', { title: !!formData.title, price: !!formData.price, phone: !!formData.contact_phone });
       showAlert('Iltimos, barcha majburiy maydonlarni to\'ldiring');
       return;
     }
@@ -80,6 +84,7 @@ export default function AddListingPage() {
     setLoading(true);
     
     try {
+      console.log('Sending request to API...');
       const response = await fetch('/api/listings', {
         method: 'POST',
         headers: {
@@ -88,7 +93,9 @@ export default function AddListingPage() {
         body: JSON.stringify(formData),
       });
 
+      console.log('Response status:', response.status);
       const result = await response.json();
+      console.log('Response data:', result);
 
       if (!response.ok) {
         throw new Error(result.error || 'Xatolik yuz berdi');
@@ -128,6 +135,17 @@ export default function AddListingPage() {
 
       {/* Form */}
       <div className="p-4">
+        {/* Debug info */}
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h3 className="font-semibold text-yellow-800 mb-2">Debug Info:</h3>
+          <div className="text-sm text-yellow-700">
+            <p>Title: "{formData.title}"</p>
+            <p>Price: "{formData.price}"</p>
+            <p>Phone: "{formData.contact_phone}"</p>
+            <p>Category: "{formData.category}"</p>
+          </div>
+        </div>
+        
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Category Selection */}
           <div className="bg-white rounded-lg p-4 shadow-sm">
