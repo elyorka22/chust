@@ -7,7 +7,7 @@ import { useTelegramApp } from '@/hooks/useTelegramApp';
 import { Listing, Category } from '@/types';
 import CategoryFilter from '@/components/CategoryFilter';
 import SimpleThemeToggle from '@/components/SimpleThemeToggle';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 
 // Dynamic import of the map to avoid SSR issues
 const DemoMap = dynamic(() => import('@/components/DemoMap'), {
@@ -166,6 +166,17 @@ export default function MapPage() {
         selectedTheme={selectedTheme}
         onThemeChange={handleThemeChange}
       />
+      
+      {/* Add Listing Button */}
+      <div className="absolute bottom-20 right-4 z-[1000]">
+        <button
+          onClick={() => router.push('/add')}
+          className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+          title="Yangi e\'lon qo\'shish"
+        >
+          <Plus size={24} />
+        </button>
+      </div>
       
       {/* Information Panel */}
       <div className="absolute bottom-4 left-4 right-4 z-[1000] bg-white rounded-lg shadow-lg p-3">

@@ -30,6 +30,12 @@ export async function POST(request: NextRequest) {
               ],
               [
                 {
+                  text: '📝 Yangi e\'lon qo\'shish',
+                  web_app: { url: `${WEBAPP_URL}/add` }
+                }
+              ],
+              [
+                {
                   text: '📋 Oddiy foydalanuvchi',
                   callback_data: 'regular_user'
                 },
