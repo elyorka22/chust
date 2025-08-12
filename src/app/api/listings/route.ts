@@ -77,6 +77,9 @@ const demoListings = [
   }
 ];
 
+// In-memory storage for demo mode
+let demoStorage = [...demoListings];
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -88,9 +91,9 @@ export async function GET(request: NextRequest) {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.warn('Supabase environment variables not found, using demo data');
       
-      let filteredListings = demoListings;
+      let filteredListings = demoStorage;
       if (category) {
-        filteredListings = demoListings.filter(listing => listing.category.slug === category);
+        filteredListings = demoStorage.filter(listing => listing.category.slug === category);
       }
       
       return NextResponse.json({
@@ -150,23 +153,53 @@ export async function POST(request: NextRequest) {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.warn('Supabase environment variables not found, using demo mode');
       
-      // In demo mode, just return success
-      const newListing = {
+      // In demo mode, create a new listing and add to storage
+      const newListing: any = {
         id: Math.floor(Math.random() * 10000) + 1000,
-        ...body,
+        user_id: 'demo_user',
+        category_id: body.category === 'rent' ? 1 : 2,
+        title: body.title,
+        description: body.description || '',
+        price: parseFloat(body.price),
+        currency: body.currency || 'USD',
+        property_type: body.property_type || 'Kvartira',
+        area: body.area ? parseFloat(body.area) : null,
+        rooms: body.rooms ? parseInt(body.rooms) : null,
+        floor: body.floor ? parseInt(body.floor) : null,
+        total_floors: body.total_floors ? parseInt(body.total_floors) : null,
+        address: `Lat: ${body.latitude || 40.9977}, Lng: ${body.longitude || 71.2374}`,
+        latitude: body.latitude || 40.9977,
+        longitude: body.longitude || 71.2374,
+        contact_phone: body.contact_phone,
+        contact_email: null,
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        latitude: 40.9977, // Default Chust coordinates
-        longitude: 71.2374,
-        user_id: 'demo_user',
-        category_id: body.category === 'rent' ? 1 : 2
+        category: { 
+          id: body.category === 'rent' ? 1 : 2, 
+          name: body.category === 'rent' ? 'Ijara' : 'Sotish', 
+          slug: body.category, 
+          created_at: '2024-01-01T00:00:00Z' 
+        },
+        user: { 
+          id: 'demo_user', 
+          telegram_id: 123456789, 
+          first_name: 'Demo', 
+          last_name: 'User', 
+          phone: body.contact_phone, 
+          email: null, 
+          is_verified: true, 
+          created_at: '2024-01-01T00:00:00Z', 
+          updated_at: '2024-01-01T00:00:00Z' 
+        }
       };
+      
+      demoStorage.push(newListing); // Add to in-memory storage
       
       return NextResponse.json({
         success: true,
         listing: newListing,
-        message: 'Demo mode: Listing would be saved in production'
+        message: 'Demo mode: Listing saved successfully'
       });
     }
 

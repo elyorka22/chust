@@ -104,6 +104,8 @@ export default function MapPage() {
   const { isReady, expand, isTelegramApp } = useTelegramApp();
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [loading, setLoading] = useState(true);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [categories, setCategories] = useState<Category[]>(demoCategories);
 
   useEffect(() => {
     if (isReady && isTelegramApp) {
@@ -112,12 +114,28 @@ export default function MapPage() {
   }, [isReady, isTelegramApp, expand]);
 
   useEffect(() => {
-    // Simulate data loading
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    // Load listings from API
+    const fetchListings = async () => {
+      try {
+        const response = await fetch('/api/listings');
+        const data = await response.json();
+        
+        if (data.listings) {
+          setListings(data.listings);
+        } else {
+          // Fallback to demo data if API fails
+          setListings(demoListings);
+        }
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+        // Fallback to demo data
+        setListings(demoListings);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    fetchListings();
   }, []);
 
   const handleListingClick = (listing: Listing) => {
@@ -149,7 +167,7 @@ export default function MapPage() {
       />
       
       <CategoryFilter
-        categories={demoCategories}
+        categories={categories}
         selectedCategory={selectedCategory}
         onCategoryChange={handleCategoryChange}
       />
@@ -162,7 +180,7 @@ export default function MapPage() {
               Chust shahri ko&apos;chmas mulk
             </h2>
             <p className="text-xs text-gray-600">
-              Xaritada {demoListings.length} ta e&apos;lon
+              Xaritada {listings.length} ta e&apos;lon
             </p>
           </div>
           

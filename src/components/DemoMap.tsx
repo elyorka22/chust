@@ -125,16 +125,44 @@ export default function DemoMap({
   center = [40.9977, 71.2374], // Чуст координаты
   zoom = 13
 }: DemoMapProps) {
-  const [filteredListings, setFilteredListings] = useState<Listing[]>(demoListings);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // Load listings from API
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const response = await fetch('/api/listings');
+        const data = await response.json();
+        
+        if (data.listings) {
+          setListings(data.listings);
+        } else {
+          // Fallback to demo data if API fails
+          setListings(demoListings);
+        }
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+        // Fallback to demo data
+        setListings(demoListings);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListings();
+  }, []);
+
+  // Filter listings based on selected category
   useEffect(() => {
     if (selectedCategory) {
-      const filtered = demoListings.filter(listing => listing.category.slug === selectedCategory);
+      const filtered = listings.filter(listing => listing.category.slug === selectedCategory);
       setFilteredListings(filtered);
     } else {
-      setFilteredListings(demoListings);
+      setFilteredListings(listings);
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, listings]);
 
   const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat('ru-RU', {
