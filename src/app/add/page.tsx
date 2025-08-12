@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTelegramApp } from '@/hooks/useTelegramApp';
-import { ArrowLeft, MapPin, Upload, Plus, X } from 'lucide-react';
+import { ArrowLeft, MapPin } from 'lucide-react';
 
 interface FormData {
   title: string;
@@ -23,7 +23,7 @@ interface FormData {
 
 export default function AddListingPage() {
   const router = useRouter();
-  const { isReady, expand, isTelegramApp, showAlert } = useTelegramApp();
+  const { showAlert } = useTelegramApp();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -216,7 +216,7 @@ export default function AddListingPage() {
                 <option value="Kvartira">Kvartira</option>
                 <option value="Uy">Uy</option>
                 <option value="Ofis">Ofis</option>
-                <option value="Do'kon">Do'kon</option>
+                <option value="Do&apos;kon">Do&apos;kon</option>
               </select>
             </div>
 

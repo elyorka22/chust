@@ -96,7 +96,7 @@ const demoListings: Listing[] = [
 export default function ListingDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { isReady, expand, isTelegramApp, showAlert } = useTelegramApp();
+  const { isReady, expand, isTelegramApp } = useTelegramApp();
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
 
