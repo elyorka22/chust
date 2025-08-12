@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
+import { Listing } from '@/types';
 
 // Demo data for fallback
 const demoListings = [
@@ -78,7 +79,7 @@ const demoListings = [
 ];
 
 // In-memory storage for demo mode
-const demoStorage: any[] = [...demoListings];
+const demoStorage: Listing[] = [...demoListings];
 
 export async function GET(request: NextRequest) {
   try {
@@ -154,7 +155,7 @@ export async function POST(request: NextRequest) {
       console.warn('Supabase environment variables not found, using demo mode');
       
       // In demo mode, create a new listing and add to storage
-      const newListing = {
+      const newListing: Listing = {
         id: Math.floor(Math.random() * 10000) + 1000,
         user_id: 'demo_user',
         category_id: body.category === 'rent' ? 1 : 2,
@@ -163,15 +164,15 @@ export async function POST(request: NextRequest) {
         price: parseFloat(body.price),
         currency: body.currency || 'USD',
         property_type: body.property_type || 'Kvartira',
-        area: body.area ? parseFloat(body.area) : null,
-        rooms: body.rooms ? parseInt(body.rooms) : null,
-        floor: body.floor ? parseInt(body.floor) : null,
-        total_floors: body.total_floors ? parseInt(body.total_floors) : null,
+        area: body.area ? parseFloat(body.area) : undefined,
+        rooms: body.rooms ? parseInt(body.rooms) : undefined,
+        floor: body.floor ? parseInt(body.floor) : undefined,
+        total_floors: body.total_floors ? parseInt(body.total_floors) : undefined,
         address: `Lat: ${body.latitude || 40.9977}, Lng: ${body.longitude || 71.2374}`,
         latitude: body.latitude || 40.9977,
         longitude: body.longitude || 71.2374,
         contact_phone: body.contact_phone,
-        contact_email: null,
+        contact_email: undefined,
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -187,12 +188,12 @@ export async function POST(request: NextRequest) {
           first_name: 'Demo', 
           last_name: 'User', 
           phone: body.contact_phone, 
-          email: null, 
+          email: undefined, 
           is_verified: true, 
           created_at: '2024-01-01T00:00:00Z', 
           updated_at: '2024-01-01T00:00:00Z' 
         }
-      } as any;
+      };
       
       demoStorage.push(newListing); // Add to in-memory storage
       
