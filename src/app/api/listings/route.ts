@@ -200,8 +200,8 @@ export async function POST(request: NextRequest) {
         floor: body.floor ? parseInt(body.floor) : null,
         total_floors: body.total_floors ? parseInt(body.total_floors) : null,
         address: body.address,
-        latitude: 40.9977, // Default Chust coordinates
-        longitude: 71.2374,
+        latitude: body.latitude || 40.9977, // Use selected coordinates or default
+        longitude: body.longitude || 71.2374,
         contact_phone: body.contact_phone,
         contact_email: body.contact_email,
         category_id: category.id,

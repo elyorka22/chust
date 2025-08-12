@@ -4,6 +4,19 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTelegramApp } from '@/hooks/useTelegramApp';
 import { ArrowLeft, MapPin } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+// Dynamic import of the location picker to avoid SSR issues
+const LocationPicker = dynamic(() => import('@/components/LocationPicker'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-white rounded-lg p-4 shadow-sm">
+      <div className="h-64 w-full rounded-lg bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-500">Xarita yuklanmoqda...</p>
+      </div>
+    </div>
+  ),
+});
 
 interface FormData {
   title: string;
@@ -16,6 +29,8 @@ interface FormData {
   floor: string;
   total_floors: string;
   address: string;
+  latitude: number;
+  longitude: number;
   contact_phone: string;
   contact_email: string;
   category: 'rent' | 'sale';
@@ -36,15 +51,25 @@ export default function AddListingPage() {
     floor: '',
     total_floors: '',
     address: '',
+    latitude: 40.9977, // Default Chust coordinates
+    longitude: 71.2374,
     contact_phone: '',
     contact_email: '',
     category: 'rent'
   });
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
+  const handleInputChange = (field: keyof FormData, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng
     }));
   };
 
@@ -296,6 +321,13 @@ export default function AddListingPage() {
               </div>
             </div>
           </div>
+
+          {/* Location Picker */}
+          <LocationPicker
+            onLocationSelect={handleLocationSelect}
+            initialLat={formData.latitude}
+            initialLng={formData.longitude}
+          />
 
           {/* Contact Information */}
           <div className="bg-white rounded-lg p-4 shadow-sm space-y-4">
