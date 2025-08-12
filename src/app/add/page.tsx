@@ -55,7 +55,6 @@ export default function AddListingPage() {
   });
 
   const handleInputChange = (field: keyof FormData, value: string | number) => {
-    console.log(`Updating field ${field} with value:`, value);
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -73,10 +72,7 @@ export default function AddListingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form data:', formData);
-    
     if (!formData.title || !formData.price || !formData.contact_phone) {
-      console.log('Validation failed:', { title: !!formData.title, price: !!formData.price, phone: !!formData.contact_phone });
       showAlert('Iltimos, barcha majburiy maydonlarni to\'ldiring');
       return;
     }
@@ -84,7 +80,6 @@ export default function AddListingPage() {
     setLoading(true);
     
     try {
-      console.log('Sending request to API...');
       const response = await fetch('/api/listings', {
         method: 'POST',
         headers: {
@@ -93,9 +88,7 @@ export default function AddListingPage() {
         body: JSON.stringify(formData),
       });
 
-      console.log('Response status:', response.status);
       const result = await response.json();
-      console.log('Response data:', result);
 
       if (!response.ok) {
         throw new Error(result.error || 'Xatolik yuz berdi');
@@ -114,7 +107,7 @@ export default function AddListingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-white shadow-sm border-b">
         <div className="flex items-center p-4">
           <button
             onClick={() => router.back()}
@@ -134,19 +127,8 @@ export default function AddListingPage() {
       </div>
 
       {/* Form */}
-      <div className="p-4">
-        {/* Debug info */}
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <h3 className="font-semibold text-yellow-800 mb-2">Debug Info:</h3>
-          <div className="text-sm text-yellow-700">
-            <p>Title: &quot;{formData.title}&quot;</p>
-            <p>Price: &quot;{formData.price}&quot;</p>
-            <p>Phone: &quot;{formData.contact_phone}&quot;</p>
-            <p>Category: &quot;{formData.category}&quot;</p>
-          </div>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="p-4 pb-8">
+        <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
           {/* Category Selection */}
           <div className="bg-white rounded-lg p-4 shadow-sm">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Kategoriya</h2>
@@ -190,7 +172,7 @@ export default function AddListingPage() {
                 type="text"
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900"
                 placeholder="Masalan: Markazdagi 2 xonali kvartira"
                 required
               />
@@ -204,7 +186,7 @@ export default function AddListingPage() {
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900"
                 placeholder="Ko&apos;chmas mulk haqida batafsil ma&apos;lumot..."
               />
             </div>
@@ -218,7 +200,7 @@ export default function AddListingPage() {
                   type="number"
                   value={formData.price}
                   onChange={(e) => handleInputChange('price', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900"
                   placeholder="500"
                   required
                 />
@@ -230,7 +212,7 @@ export default function AddListingPage() {
                 <select
                   value={formData.currency}
                   onChange={(e) => handleInputChange('currency', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900"
                 >
                   <option value="USD">USD</option>
                   <option value="UZS">UZS</option>
@@ -250,7 +232,7 @@ export default function AddListingPage() {
               <select
                 value={formData.property_type}
                 onChange={(e) => handleInputChange('property_type', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900"
               >
                 <option value="Kvartira">Kvartira</option>
                 <option value="Uy">Uy</option>
@@ -268,7 +250,7 @@ export default function AddListingPage() {
                   type="number"
                   value={formData.area}
                   onChange={(e) => handleInputChange('area', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900"
                   placeholder="65"
                 />
               </div>
@@ -280,7 +262,7 @@ export default function AddListingPage() {
                   type="number"
                   value={formData.rooms}
                   onChange={(e) => handleInputChange('rooms', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900"
                   placeholder="2"
                 />
               </div>
@@ -295,7 +277,7 @@ export default function AddListingPage() {
                   type="number"
                   value={formData.floor}
                   onChange={(e) => handleInputChange('floor', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900"
                   placeholder="3"
                 />
               </div>
@@ -307,7 +289,7 @@ export default function AddListingPage() {
                   type="number"
                   value={formData.total_floors}
                   onChange={(e) => handleInputChange('total_floors', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900"
                   placeholder="5"
                 />
               </div>
@@ -333,7 +315,7 @@ export default function AddListingPage() {
                 type="tel"
                 value={formData.contact_phone}
                 onChange={(e) => handleInputChange('contact_phone', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900"
                 placeholder="+998 90 123 45 67"
                 required
               />
@@ -344,7 +326,7 @@ export default function AddListingPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg"
           >
             {loading ? 'Saqlanmoqda...' : 'E&apos;lonni qo&apos;shish'}
           </button>
