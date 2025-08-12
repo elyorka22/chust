@@ -168,24 +168,24 @@ export default function MapPage() {
       />
       
       {/* Information Panel */}
-      <div className="absolute bottom-4 left-4 right-4 z-[1000] bg-white rounded-lg shadow-lg p-4">
+      <div className="absolute bottom-4 left-4 right-4 z-[1000] bg-white rounded-lg shadow-lg p-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-base font-semibold text-gray-900">
               Chust shahri ko&apos;chmas mulk
             </h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-xs text-gray-600">
               Xaritada {demoListings.length} ta e&apos;lon
             </p>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
               <span className="text-xs text-gray-600">Ijara</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
               <span className="text-xs text-gray-600">Sotish</span>
             </div>
           </div>
