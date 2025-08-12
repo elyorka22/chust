@@ -39,9 +39,6 @@ export async function POST(request: NextRequest) {
             keyboard: [
               [
                 {
-                  text: '🗺️ Xarita'
-                },
-                {
                   text: '📝 E\'lon qo\'shish'
                 }
               ],
@@ -54,9 +51,6 @@ export async function POST(request: NextRequest) {
                 }
               ],
               [
-                {
-                  text: '📞 Aloqa'
-                },
                 {
                   text: '❓ Yordam'
                 }
@@ -78,9 +72,8 @@ export async function POST(request: NextRequest) {
       let shouldSendResponse = true;
 
       switch (message.text) {
-        case '🗺️ Xarita':
         case '📝 E\'lon qo\'shish':
-          // Эти кнопки обрабатываются отдельно и отправляют ответ напрямую
+          // Эта кнопка обрабатывается отдельно и отправляет ответ напрямую
           shouldSendResponse = false;
           break;
 
@@ -92,12 +85,8 @@ export async function POST(request: NextRequest) {
           responseText = `👤 **Profil**\n\n**Foydalanuvchi ma'lumotlari:**\n\n👤 **Ism:** ${message.from.first_name || 'Aniqlanmagan'}\n📝 **Username:** ${message.from.username ? '@' + message.from.username : 'Yo\'q'}\n🆔 **ID:** \`${message.from.id}\`\n🌍 **Til:** ${message.from.language_code || 'Aniqlanmagan'}\n\n**Siz oddiy foydalanuvchisiz.**\nE'lon qo'shish uchun administrator bilan bog'laning.`;
           break;
 
-        case '📞 Aloqa':
-          responseText = '📞 **Aloqa**\n\n**Biz bilan bog\'lanish:**\n\n👨‍💻 **Dasturchi:** @elyorka22\n📧 **Email:** elyorka22@gmail.com\n🌐 **Website:** https://chust-seven.vercel.app\n\n**Qo\'llab-quvvatlash:**\nAgar savollaringiz bo\'lsa, dasturchi bilan bog\'laning.';
-          break;
-
         case '❓ Yordam':
-          responseText = '❓ **Yordam**\n\n**Bot qanday ishlaydi:**\n\n1️⃣ **Xaritani ochish** - ko\'chmas mulk e\'lonlarini ko\'rish\n2️⃣ **E\'lon qo\'shish** - yangi e\'lon yaratish\n3️⃣ **Kategoriyalar** - ijara yoki sotish bo\'yicha filtrlash\n4️⃣ **Batafsil ma\'lumot** - e\'lon haqida to\'liq ma\'lumot\n\n**Buyruqlar:**\n/start - asosiy menyu\n/help - yordam\n\n**Muammo bo\'lsa:** @elyorka22 bilan bog\'laning.';
+          responseText = '❓ **Yordam**\n\n**Bot qanday ishlaydi:**\n\n1️⃣ **E\'lon qo\'shish** - yangi e\'lon yaratish\n2️⃣ **Kategoriyalar** - ijara yoki sotish bo\'yicha filtrlash\n3️⃣ **Batafsil ma\'lumot** - e\'lon haqida to\'liq ma\'lumot\n\n**Buyruqlar:**\n/start - asosiy menyu\n/help - yordam\n\n**Muammo bo\'lsa:** @elyorka22 bilan bog\'laning.';
           break;
 
         default:
@@ -105,7 +94,6 @@ export async function POST(request: NextRequest) {
           keyboard = {
             keyboard: [
               [
-                { text: '🗺️ Xarita' },
                 { text: '📝 E\'lon qo\'shish' }
               ],
               [
@@ -113,7 +101,6 @@ export async function POST(request: NextRequest) {
                 { text: '👤 Profil' }
               ],
               [
-                { text: '📞 Aloqa' },
                 { text: '❓ Yordam' }
               ]
             ],
@@ -136,7 +123,6 @@ export async function POST(request: NextRequest) {
             reply_markup: keyboard || {
               keyboard: [
                 [
-                  { text: '🗺️ Xarita' },
                   { text: '📝 E\'lon qo\'shish' }
                 ],
                 [
@@ -144,7 +130,6 @@ export async function POST(request: NextRequest) {
                   { text: '👤 Profil' }
                 ],
                 [
-                  { text: '📞 Aloqa' },
                   { text: '❓ Yordam' }
                 ]
               ],
@@ -159,34 +144,7 @@ export async function POST(request: NextRequest) {
         }
       } else {
         // Handle web app buttons separately
-        if (message.text === '🗺️ Xarita') {
-          const mapWebAppResponse = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              chat_id: message.chat.id,
-              text: '🗺️ Xaritani ochish uchun quyidagi tugmani bosing:',
-              reply_markup: {
-                inline_keyboard: [
-                  [
-                    {
-                      text: '🗺️ Xaritani ochish',
-                      web_app: {
-                        url: WEBAPP_URL
-                      }
-                    }
-                  ]
-                ]
-              }
-            })
-          });
-          
-          if (!mapWebAppResponse.ok) {
-            console.error('Failed to send map web app button');
-          }
-        } else if (message.text === '📝 E\'lon qo\'shish') {
+        if (message.text === '📝 E\'lon qo\'shish') {
           const webAppResponse = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: {
