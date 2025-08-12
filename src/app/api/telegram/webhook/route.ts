@@ -34,46 +34,128 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           chat_id: message.chat.id,
-          text: '🏠 Chust shahri ko\'chmas mulk ilovasiga xush kelibsiz!\n\nBu yerda Chust shahridagi ijara va sotish e\'lonlarini topishingiz mumkin.\n\nXaritani ko\'rish uchun quyidagi havolani bosing:\nhttps://chust-seven.vercel.app',
+          text: '🏠 Chust shahri ko\'chmas mulk ilovasiga xush kelibsiz!\n\nBu yerda Chust shahridagi ijara va sotish e\'lonlarini topishingiz mumkin.',
           reply_markup: {
-            inline_keyboard: [
+            keyboard: [
               [
                 {
-                  text: '🗺️ Xarita',
-                  web_app: { url: WEBAPP_URL }
+                  text: '🗺️ Xarita'
                 },
                 {
-                  text: '📝 E\'lon qo\'shish',
-                  web_app: { url: `${WEBAPP_URL}/add` }
+                  text: '📝 E\'lon qo\'shish'
                 }
               ],
               [
                 {
-                  text: 'ℹ️ Bot haqida',
-                  callback_data: 'about_bot'
+                  text: 'ℹ️ Bot haqida'
                 },
                 {
-                  text: '👤 Profil',
-                  callback_data: 'profile'
+                  text: '👤 Profil'
                 }
               ],
               [
                 {
-                  text: '📞 Aloqa',
-                  callback_data: 'contact'
+                  text: '📞 Aloqa'
                 },
                 {
-                  text: '❓ Yordam',
-                  callback_data: 'help'
+                  text: '❓ Yordam'
                 }
               ]
-            ]
+            ],
+            resize_keyboard: true,
+            one_time_keyboard: false
           }
         })
       });
 
       if (!response.ok) {
         console.error('Failed to send message to Telegram');
+      }
+    } else if (message?.text) {
+      // Handle button clicks
+      let responseText = '';
+      let keyboard = null;
+
+      switch (message.text) {
+        case '🗺️ Xarita':
+          responseText = '🗺️ Xaritani ochish uchun quyidagi havolani bosing:\nhttps://chust-seven.vercel.app';
+          break;
+
+        case '📝 E\'lon qo\'shish':
+          responseText = '📝 Yangi e\'lon qo\'shish uchun quyidagi havolani bosing:\nhttps://chust-seven.vercel.app/add';
+          break;
+
+        case 'ℹ️ Bot haqida':
+          responseText = 'ℹ️ **Bot haqida**\n\n🏠 **Chust Real Estate Bot**\n\nBu bot Chust shahridagi ko\'chmas mulk e\'lonlarini ko\'rish uchun yaratilgan.\n\n**Xususiyatlar:**\n• Xaritada e\'lonlarni ko\'rish\n• Ijara va sotish kategoriyalari\n• Batafsil ma\'lumotlar\n• Aloqa ma\'lumotlari\n\n**Dasturchi:** @elyorka22\n**Versiya:** 1.0.0';
+          break;
+
+        case '👤 Profil':
+          responseText = `👤 **Profil**\n\n**Foydalanuvchi ma'lumotlari:**\n\n👤 **Ism:** ${message.from.first_name || 'Aniqlanmagan'}\n📝 **Username:** ${message.from.username ? '@' + message.from.username : 'Yo\'q'}\n🆔 **ID:** \`${message.from.id}\`\n🌍 **Til:** ${message.from.language_code || 'Aniqlanmagan'}\n\n**Siz oddiy foydalanuvchisiz.**\nE'lon qo'shish uchun administrator bilan bog'laning.`;
+          break;
+
+        case '📞 Aloqa':
+          responseText = '📞 **Aloqa**\n\n**Biz bilan bog\'lanish:**\n\n👨‍💻 **Dasturchi:** @elyorka22\n📧 **Email:** elyorka22@gmail.com\n🌐 **Website:** https://chust-seven.vercel.app\n\n**Qo\'llab-quvvatlash:**\nAgar savollaringiz bo\'lsa, dasturchi bilan bog\'laning.';
+          break;
+
+        case '❓ Yordam':
+          responseText = '❓ **Yordam**\n\n**Bot qanday ishlaydi:**\n\n1️⃣ **Xaritani ochish** - ko\'chmas mulk e\'lonlarini ko\'rish\n2️⃣ **E\'lon qo\'shish** - yangi e\'lon yaratish\n3️⃣ **Kategoriyalar** - ijara yoki sotish bo\'yicha filtrlash\n4️⃣ **Batafsil ma\'lumot** - e\'lon haqida to\'liq ma\'lumot\n\n**Buyruqlar:**\n/start - asosiy menyu\n/help - yordam\n\n**Muammo bo\'lsa:** @elyorka22 bilan bog\'laning.';
+          break;
+
+        default:
+          responseText = 'Iltimos, quyidagi tugmalardan birini tanlang:';
+          keyboard = {
+            keyboard: [
+              [
+                { text: '🗺️ Xarita' },
+                { text: '📝 E\'lon qo\'shish' }
+              ],
+              [
+                { text: 'ℹ️ Bot haqida' },
+                { text: '👤 Profil' }
+              ],
+              [
+                { text: '📞 Aloqa' },
+                { text: '❓ Yordam' }
+              ]
+            ],
+            resize_keyboard: true,
+            one_time_keyboard: false
+          };
+      }
+
+      // Send response
+      const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: message.chat.id,
+          text: responseText,
+          parse_mode: 'Markdown',
+          reply_markup: keyboard || {
+            keyboard: [
+              [
+                { text: '🗺️ Xarita' },
+                { text: '📝 E\'lon qo\'shish' }
+              ],
+              [
+                { text: 'ℹ️ Bot haqida' },
+                { text: '👤 Profil' }
+              ],
+              [
+                { text: '📞 Aloqa' },
+                { text: '❓ Yordam' }
+              ]
+            ],
+            resize_keyboard: true,
+            one_time_keyboard: false
+          }
+        })
+      });
+
+      if (!response.ok) {
+        console.error('Failed to send response to Telegram');
       }
     }
 
