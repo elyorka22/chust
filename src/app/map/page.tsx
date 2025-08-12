@@ -140,7 +140,7 @@ export default function MapPage() {
       <div className="w-full h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">E\'lonlar yuklanmoqda...</p>
+          <p className="text-gray-600">E&apos;lonlar yuklanmoqda...</p>
         </div>
       </div>
     );
@@ -172,10 +172,10 @@ export default function MapPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">
-              Chust shahri ko\'chmas mulk
+              Chust shahri ko&apos;chmas mulk
             </h2>
             <p className="text-sm text-gray-600">
-              Xaritada {demoListings.length} ta e\'lon
+              Xaritada {demoListings.length} ta e&apos;lon
             </p>
           </div>
           
@@ -195,7 +195,7 @@ export default function MapPage() {
       {/* Demo Notice */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg shadow-lg">
         <p className="text-sm font-medium">Demo rejim</p>
-        <p className="text-xs">Ko\'rsatish uchun test ma\'lumotlari</p>
+        <p className="text-xs">Ko&apos;rsatish uchun test ma&apos;lumotlari</p>
       </div>
     </div>
   );

@@ -100,29 +100,6 @@ export default function ListingDetailPage() {
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchListing = async () => {
-    try {
-      setLoading(true);
-      // Имитируем загрузку данных
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const listingId = parseInt(params.id as string);
-      const foundListing = demoListings.find(l => l.id === listingId);
-      
-      if (!foundListing) {
-        throw new Error('Listing not found');
-      }
-      
-      setListing(foundListing);
-    } catch (error) {
-      console.error('Error fetching listing:', error);
-      showAlert('Объявление не найдено');
-      router.push('/map');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (isReady && isTelegramApp) {
       expand();
@@ -130,10 +107,30 @@ export default function ListingDetailPage() {
   }, [isReady, isTelegramApp, expand]);
 
   useEffect(() => {
+    const fetchListing = async () => {
+      if (!params.id) return;
+      
+      try {
+        setLoading(true);
+        // For demo purposes, use local data
+        const foundListing = demoListings.find(l => l.id.toString() === params.id);
+        if (foundListing) {
+          setListing(foundListing);
+        } else {
+          setListing(null);
+        }
+      } catch (error) {
+        console.error('Error fetching listing:', error);
+        setListing(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (params.id) {
       fetchListing();
     }
-  }, [params.id, fetchListing]);
+  }, [params.id]);
 
   const formatPrice = (price?: number, currency: string = 'USD') => {
     if (!price) return 'Цена не указана';

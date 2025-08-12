@@ -27,7 +27,7 @@ export default function SimpleThemeToggle({ selectedTheme, onThemeChange }: Simp
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          🌙 Qorong\'i
+          🌙 Qorong&apos;i
         </button>
       </div>
     </div>
