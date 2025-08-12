@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import { useTelegramApp } from '@/hooks/useTelegramApp';
 import { Listing, Category } from '@/types';
 import CategoryFilter from '@/components/CategoryFilter';
-import SimpleThemeToggle from '@/components/SimpleThemeToggle';
 import { Loader2 } from 'lucide-react';
 
 // Dynamic import of the map to avoid SSR issues
@@ -104,7 +103,6 @@ export default function MapPage() {
   const router = useRouter();
   const { isReady, expand, isTelegramApp } = useTelegramApp();
   const [selectedCategory, setSelectedCategory] = useState<string>();
-  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark'>('light');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -130,11 +128,6 @@ export default function MapPage() {
     setSelectedCategory(categorySlug);
   };
 
-  const handleThemeChange = (theme: 'light' | 'dark') => {
-    console.log('Смена темы на:', theme);
-    setSelectedTheme(theme);
-  };
-
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -153,18 +146,12 @@ export default function MapPage() {
         onListingClick={handleListingClick}
         center={[40.9977, 71.2374]} // Чуст координаты
         zoom={13}
-        theme={selectedTheme}
       />
       
       <CategoryFilter
         categories={demoCategories}
         selectedCategory={selectedCategory}
         onCategoryChange={handleCategoryChange}
-      />
-
-      <SimpleThemeToggle
-        selectedTheme={selectedTheme}
-        onThemeChange={handleThemeChange}
       />
       
       {/* Information Panel */}

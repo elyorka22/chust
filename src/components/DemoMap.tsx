@@ -107,7 +107,6 @@ interface DemoMapProps {
   onListingClick?: (listing: Listing) => void;
   center?: [number, number];
   zoom?: number;
-  theme?: 'light' | 'dark';
 }
 
 function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
@@ -124,8 +123,7 @@ export default function DemoMap({
   selectedCategory, 
   onListingClick, 
   center = [40.9977, 71.2374], // Чуст координаты
-  zoom = 13,
-  theme = 'light' // По умолчанию светлая тема
+  zoom = 13
 }: DemoMapProps) {
   const [filteredListings, setFilteredListings] = useState<Listing[]>(demoListings);
 
@@ -146,8 +144,6 @@ export default function DemoMap({
     }).format(price);
   };
 
-  const currentTheme = mapThemes[theme];
-
   return (
     <div className="w-full h-full">
       <MapContainer
@@ -160,8 +156,8 @@ export default function DemoMap({
         <MapController center={center} zoom={zoom} />
         
         <TileLayer
-          attribution={currentTheme.attribution}
-          url={currentTheme.url}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         
         {filteredListings.map((listing) => (
