@@ -10,13 +10,13 @@ interface CategoryFilterProps {
 
 export default function CategoryFilter({ categories, selectedCategory, onCategoryChange }: CategoryFilterProps) {
   return (
-    <div className="absolute top-4 left-4 z-[1000]">
+    <div className="absolute top-4 right-4 z-[1000]">
       <div className="bg-white rounded-lg shadow-lg p-2">
-        <h3 className="text-sm font-semibold text-gray-900 mb-2 px-2">Kategoriyalar</h3>
+        <h3 className="text-xs font-semibold text-gray-900 mb-1 px-1">Kategoriyalar</h3>
         <div className="space-y-1">
           <button
             onClick={() => onCategoryChange(undefined)}
-            className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`w-full text-left px-2 py-1 rounded-md text-xs font-medium transition-colors ${
               !selectedCategory
                 ? 'bg-blue-100 text-blue-800'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -28,7 +28,7 @@ export default function CategoryFilter({ categories, selectedCategory, onCategor
             <button
               key={category.id}
               onClick={() => onCategoryChange(category.slug)}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`w-full text-left px-2 py-1 rounded-md text-xs font-medium transition-colors ${
                 selectedCategory === category.slug
                   ? 'bg-blue-100 text-blue-800'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
