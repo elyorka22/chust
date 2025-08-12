@@ -191,12 +191,6 @@ export default function MapPage() {
           </div>
         </div>
       </div>
-
-      {/* Demo Notice */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg shadow-lg">
-        <p className="text-sm font-medium">Demo rejim</p>
-        <p className="text-xs">Ko&apos;rsatish uchun test ma&apos;lumotlari</p>
-      </div>
     </div>
   );
 } 

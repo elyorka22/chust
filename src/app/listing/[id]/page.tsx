@@ -320,12 +320,6 @@ export default function ListingDetailPage() {
             <span>Опубликовано: {new Date(listing.created_at).toLocaleDateString('ru-RU')}</span>
           </div>
         </div>
-
-        {/* Demo notice */}
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded-lg">
-          <p className="text-sm font-medium">Демо-режим</p>
-          <p className="text-xs">Это тестовые данные для демонстрации функциональности</p>
-        </div>
       </div>
     </div>
   );
