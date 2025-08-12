@@ -39,12 +39,32 @@ export async function POST(request: NextRequest) {
             inline_keyboard: [
               [
                 {
+                  text: '🗺️ Xarita',
+                  web_app: { url: WEBAPP_URL }
+                },
+                {
+                  text: '📝 E\'lon qo\'shish',
+                  web_app: { url: `${WEBAPP_URL}/add` }
+                }
+              ],
+              [
+                {
                   text: 'ℹ️ Bot haqida',
                   callback_data: 'about_bot'
                 },
                 {
                   text: '👤 Profil',
                   callback_data: 'profile'
+                }
+              ],
+              [
+                {
+                  text: '📞 Aloqa',
+                  callback_data: 'contact'
+                },
+                {
+                  text: '❓ Yordam',
+                  callback_data: 'help'
                 }
               ]
             ]

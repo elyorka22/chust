@@ -78,6 +78,56 @@ export async function POST(request: NextRequest) {
         });
         break;
 
+      case 'contact':
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: message.chat.id,
+            message_id: message.message_id,
+            text: '📞 **Aloqa**\n\n**Biz bilan bog\'lanish:**\n\n👨‍💻 **Dasturchi:** @elyorka22\n📧 **Email:** elyorka22@gmail.com\n🌐 **Website:** https://chust-seven.vercel.app\n\n**Qo\'llab-quvvatlash:**\nAgar savollaringiz bo\'lsa, dasturchi bilan bog\'laning.',
+            parse_mode: 'Markdown',
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  {
+                    text: '🔙 Orqaga',
+                    callback_data: 'back_to_main'
+                  }
+                ]
+              ]
+            }
+          })
+        });
+        break;
+
+      case 'help':
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: message.chat.id,
+            message_id: message.message_id,
+            text: '❓ **Yordam**\n\n**Bot qanday ishlaydi:**\n\n1️⃣ **Xaritani ochish** - ko\'chmas mulk e\'lonlarini ko\'rish\n2️⃣ **E\'lon qo\'shish** - yangi e\'lon yaratish\n3️⃣ **Kategoriyalar** - ijara yoki sotish bo\'yicha filtrlash\n4️⃣ **Batafsil ma\'lumot** - e\'lon haqida to\'liq ma\'lumot\n\n**Buyruqlar:**\n/start - asosiy menyu\n/help - yordam\n\n**Muammo bo\'lsa:** @elyorka22 bilan bog\'laning.',
+            parse_mode: 'Markdown',
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  {
+                    text: '🔙 Orqaga',
+                    callback_data: 'back_to_main'
+                  }
+                ]
+              ]
+            }
+          })
+        });
+        break;
+
       case 'back_to_main':
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`, {
           method: 'POST',
@@ -87,9 +137,19 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             chat_id: message.chat.id,
             message_id: message.message_id,
-            text: '🏠 Chust shahri ko\'chmas mulk ilovasiga xush kelibsiz!\n\nBu yerda Chust shahridagi ijara va sotish e\'lonlarini topishingiz mumkin.\n\nXaritani ko\'rish uchun quyidagi havolani bosing:\nhttps://chust-seven.vercel.app',
+            text: '🏠 Chust shahri ko\'chmas mulk ilovasiga xush kelibsiz!\n\nBu yerda Chust shahridagi ijara va sotish e\'lonlarini topishingiz mumkin.',
             reply_markup: {
               inline_keyboard: [
+                [
+                  {
+                    text: '🗺️ Xarita',
+                    web_app: { url: 'https://chust-seven.vercel.app' }
+                  },
+                  {
+                    text: '📝 E\'lon qo\'shish',
+                    web_app: { url: 'https://chust-seven.vercel.app/add' }
+                  }
+                ],
                 [
                   {
                     text: 'ℹ️ Bot haqida',
@@ -98,6 +158,16 @@ export async function POST(request: NextRequest) {
                   {
                     text: '👤 Profil',
                     callback_data: 'profile'
+                  }
+                ],
+                [
+                  {
+                    text: '📞 Aloqa',
+                    callback_data: 'contact'
+                  },
+                  {
+                    text: '❓ Yordam',
+                    callback_data: 'help'
                   }
                 ]
               ]
