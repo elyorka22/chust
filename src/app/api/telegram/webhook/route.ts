@@ -19,22 +19,22 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           chat_id: message.chat.id,
-          text: '🏠 Добро пожаловать в приложение недвижимости Чуста!\n\nЗдесь вы можете найти объявления об аренде и продаже недвижимости в городе Чуст.',
+          text: '🏠 Chust shahri ko\'chmas mulk ilovasiga xush kelibsiz!\n\nBu yerda Chust shahridagi ijara va sotish e\'lonlarini topishingiz mumkin.',
           reply_markup: {
             inline_keyboard: [
               [
                 {
-                  text: '🗺️ Открыть карту недвижимости',
+                  text: '🗺️ Ko\'chmas mulk xaritasini ochish',
                   web_app: { url: WEBAPP_URL }
                 }
               ],
               [
                 {
-                  text: '📋 Обычный пользователь',
+                  text: '📋 Oddiy foydalanuvchi',
                   callback_data: 'regular_user'
                 },
                 {
-                  text: '📝 Разместить объявление',
+                  text: '📝 E\'lon berish',
                   callback_data: 'post_ad'
                 }
               ]

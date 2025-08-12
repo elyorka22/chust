@@ -17,7 +17,7 @@ export default function SimpleThemeToggle({ selectedTheme, onThemeChange }: Simp
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          ☀️ Светлая
+          ☀️ Yorug
         </button>
         <button
           onClick={() => onThemeChange('dark')}
@@ -27,7 +27,7 @@ export default function SimpleThemeToggle({ selectedTheme, onThemeChange }: Simp
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          🌙 Темная
+          🌙 Qorong\'i
         </button>
       </div>
     </div>

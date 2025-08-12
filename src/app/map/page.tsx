@@ -21,8 +21,8 @@ const DemoMap = dynamic(() => import('@/components/DemoMap'), {
 
 // Demo data
 const demoCategories: Category[] = [
-  { id: 1, name: 'Аренда', slug: 'rent', created_at: '2024-01-01T00:00:00Z' },
-  { id: 2, name: 'Продажа', slug: 'sale', created_at: '2024-01-01T00:00:00Z' }
+  { id: 1, name: 'Ijara', slug: 'rent', created_at: '2024-01-01T00:00:00Z' },
+  { id: 2, name: 'Sotish', slug: 'sale', created_at: '2024-01-01T00:00:00Z' }
 ];
 
 const demoListings: Listing[] = [
@@ -30,16 +30,16 @@ const demoListings: Listing[] = [
     id: 1,
     user_id: '1',
     category_id: 1,
-    title: 'Уютная 2-комнатная квартира в центре',
-    description: 'Современная квартира с ремонтом, мебелью и техникой',
+    title: 'Markazdagi 2 xonali kvartira',
+    description: 'Zamonaviy jihozlangan va mebellangan kvartira',
     price: 500,
     currency: 'USD',
-    property_type: 'Квартира',
+    property_type: 'Kvartira',
     area: 65,
     rooms: 2,
     floor: 3,
     total_floors: 5,
-    address: 'ул. Навои, 15',
+    address: 'Navoiy ko\'chasi, 15',
     latitude: 40.9977,
     longitude: 71.2374,
     contact_phone: '+998 90 123 45 67',
@@ -48,22 +48,22 @@ const demoListings: Listing[] = [
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-01-15T10:00:00Z',
     category: demoCategories[0],
-    user: { id: '1', telegram_id: 123456789, first_name: 'Алишер', last_name: 'Каримов', phone: '+998 90 123 45 67', email: 'owner1@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
+    user: { id: '1', telegram_id: 123456789, first_name: 'Alisher', last_name: 'Karimov', phone: '+998 90 123 45 67', email: 'owner1@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
   },
   {
     id: 2,
     user_id: '2',
     category_id: 2,
-    title: 'Дом с участком в тихом районе',
-    description: 'Просторный дом с большим участком, гаражом и садом',
+    title: 'Hovli va bog\'li uy',
+    description: 'Katta hovli va garajli uy, bog\' bilan',
     price: 85000,
     currency: 'USD',
-    property_type: 'Дом',
+    property_type: 'Uy',
     area: 120,
     rooms: 4,
     floor: 1,
     total_floors: 1,
-    address: 'ул. Мирзо Улугбека, 45',
+    address: 'Mirzo Ulug\'bek ko\'chasi, 45',
     latitude: 40.9985,
     longitude: 71.2360,
     contact_phone: '+998 90 987 65 43',
@@ -72,22 +72,22 @@ const demoListings: Listing[] = [
     created_at: '2024-01-14T14:30:00Z',
     updated_at: '2024-01-14T14:30:00Z',
     category: demoCategories[1],
-    user: { id: '2', telegram_id: 987654321, first_name: 'Мадина', last_name: 'Ахмедова', phone: '+998 90 987 65 43', email: 'owner2@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
+    user: { id: '2', telegram_id: 987654321, first_name: 'Madina', last_name: 'Axmedova', phone: '+998 90 987 65 43', email: 'owner2@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
   },
   {
     id: 3,
     user_id: '3',
     category_id: 1,
-    title: '1-комнатная квартира для студентов',
-    description: 'Компактная квартира рядом с университетом',
+    title: 'Talabalar uchun 1 xonali kvartira',
+    description: 'Universitet yonida joylashgan ixcham kvartira',
     price: 300,
     currency: 'USD',
-    property_type: 'Квартира',
+    property_type: 'Kvartira',
     area: 35,
     rooms: 1,
     floor: 2,
     total_floors: 4,
-    address: 'ул. Алишера Навои, 78',
+    address: 'Alisher Navoiy ko\'chasi, 78',
     latitude: 40.9965,
     longitude: 71.2385,
     contact_phone: '+998 90 555 12 34',
@@ -96,7 +96,7 @@ const demoListings: Listing[] = [
     created_at: '2024-01-13T09:15:00Z',
     updated_at: '2024-01-13T09:15:00Z',
     category: demoCategories[0],
-    user: { id: '3', telegram_id: 555666777, first_name: 'Дилшод', last_name: 'Рахимов', phone: '+998 90 555 12 34', email: 'owner3@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
+    user: { id: '3', telegram_id: 555666777, first_name: 'Dilshod', last_name: 'Raximov', phone: '+998 90 555 12 34', email: 'owner3@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
   }
 ];
 
@@ -140,7 +140,7 @@ export default function MapPage() {
       <div className="w-full h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Загрузка объявлений...</p>
+          <p className="text-gray-600">E\'lonlar yuklanmoqda...</p>
         </div>
       </div>
     );
@@ -172,21 +172,21 @@ export default function MapPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">
-              Недвижимость в Чусте
+              Chust shahri ko\'chmas mulk
             </h2>
             <p className="text-sm text-gray-600">
-              {demoListings.length} объявлений на карте
+              Xaritada {demoListings.length} ta e\'lon
             </p>
           </div>
           
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-              <span className="text-xs text-gray-600">Аренда</span>
+              <span className="text-xs text-gray-600">Ijara</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span className="text-xs text-gray-600">Продажа</span>
+              <span className="text-xs text-gray-600">Sotish</span>
             </div>
           </div>
         </div>
@@ -194,8 +194,8 @@ export default function MapPage() {
 
       {/* Demo Notice */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg shadow-lg">
-        <p className="text-sm font-medium">Демо-режим</p>
-        <p className="text-xs">Тестовые данные для демонстрации</p>
+        <p className="text-sm font-medium">Demo rejim</p>
+        <p className="text-xs">Ko\'rsatish uchun test ma\'lumotlari</p>
       </div>
     </div>
   );
