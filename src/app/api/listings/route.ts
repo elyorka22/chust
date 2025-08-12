@@ -78,7 +78,7 @@ const demoListings = [
 ];
 
 // In-memory storage for demo mode
-let demoStorage = [...demoListings];
+const demoStorage: any[] = [...demoListings];
 
 export async function GET(request: NextRequest) {
   try {
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
       console.warn('Supabase environment variables not found, using demo mode');
       
       // In demo mode, create a new listing and add to storage
-      const newListing: any = {
+      const newListing = {
         id: Math.floor(Math.random() * 10000) + 1000,
         user_id: 'demo_user',
         category_id: body.category === 'rent' ? 1 : 2,
@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
           created_at: '2024-01-01T00:00:00Z', 
           updated_at: '2024-01-01T00:00:00Z' 
         }
-      };
+      } as any;
       
       demoStorage.push(newListing); // Add to in-memory storage
       

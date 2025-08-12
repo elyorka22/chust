@@ -105,7 +105,7 @@ export default function MapPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState<Listing[]>([]);
-  const [categories, setCategories] = useState<Category[]>(demoCategories);
+  const [categories] = useState<Category[]>(demoCategories);
 
   useEffect(() => {
     if (isReady && isTelegramApp) {

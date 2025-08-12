@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTelegramApp } from '@/hooks/useTelegramApp';
-import { ArrowLeft, MapPin } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 // Dynamic import of the location picker to avoid SSR issues
@@ -139,10 +139,10 @@ export default function AddListingPage() {
         <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <h3 className="font-semibold text-yellow-800 mb-2">Debug Info:</h3>
           <div className="text-sm text-yellow-700">
-            <p>Title: "{formData.title}"</p>
-            <p>Price: "{formData.price}"</p>
-            <p>Phone: "{formData.contact_phone}"</p>
-            <p>Category: "{formData.category}"</p>
+            <p>Title: &quot;{formData.title}&quot;</p>
+            <p>Price: &quot;{formData.price}&quot;</p>
+            <p>Phone: &quot;{formData.contact_phone}&quot;</p>
+            <p>Category: &quot;{formData.category}&quot;</p>
           </div>
         </div>
         
