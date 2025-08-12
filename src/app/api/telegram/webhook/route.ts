@@ -75,14 +75,13 @@ export async function POST(request: NextRequest) {
       // Handle button clicks
       let responseText = '';
       let keyboard = null;
+      let shouldSendResponse = true;
 
       switch (message.text) {
         case '🗺️ Xarita':
-          responseText = '🗺️ Xaritani ochish uchun quyidagi havolani bosing:\nhttps://chust-seven.vercel.app';
-          break;
-
         case '📝 E\'lon qo\'shish':
-          responseText = '📝 Yangi e\'lon qo\'shish uchun quyidagi havolani bosing:\nhttps://chust-seven.vercel.app/add';
+          // Эти кнопки обрабатываются отдельно и отправляют ответ напрямую
+          shouldSendResponse = false;
           break;
 
         case 'ℹ️ Bot haqida':
@@ -123,39 +122,98 @@ export async function POST(request: NextRequest) {
           };
       }
 
-      // Send response
-      const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chat_id: message.chat.id,
-          text: responseText,
-          parse_mode: 'Markdown',
-          reply_markup: keyboard || {
-            keyboard: [
-              [
-                { text: '🗺️ Xarita' },
-                { text: '📝 E\'lon qo\'shish' }
+      // Send response only if needed
+      if (shouldSendResponse) {
+        const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: message.chat.id,
+            text: responseText,
+            parse_mode: 'Markdown',
+            reply_markup: keyboard || {
+              keyboard: [
+                [
+                  { text: '🗺️ Xarita' },
+                  { text: '📝 E\'lon qo\'shish' }
+                ],
+                [
+                  { text: 'ℹ️ Bot haqida' },
+                  { text: '👤 Profil' }
+                ],
+                [
+                  { text: '📞 Aloqa' },
+                  { text: '❓ Yordam' }
+                ]
               ],
-              [
-                { text: 'ℹ️ Bot haqida' },
-                { text: '👤 Profil' }
-              ],
-              [
-                { text: '📞 Aloqa' },
-                { text: '❓ Yordam' }
-              ]
-            ],
-            resize_keyboard: true,
-            one_time_keyboard: false
-          }
-        })
-      });
+              resize_keyboard: true,
+              one_time_keyboard: false
+            }
+          })
+        });
 
-      if (!response.ok) {
-        console.error('Failed to send response to Telegram');
+        if (!response.ok) {
+          console.error('Failed to send response to Telegram');
+        }
+      } else {
+        // Handle web app buttons separately
+        if (message.text === '🗺️ Xarita') {
+          const mapWebAppResponse = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              chat_id: message.chat.id,
+              text: '🗺️ Xaritani ochish uchun quyidagi tugmani bosing:',
+              reply_markup: {
+                inline_keyboard: [
+                  [
+                    {
+                      text: '🗺️ Xaritani ochish',
+                      web_app: {
+                        url: WEBAPP_URL
+                      }
+                    }
+                  ]
+                ]
+              }
+            })
+          });
+          
+          if (!mapWebAppResponse.ok) {
+            console.error('Failed to send map web app button');
+          }
+        } else if (message.text === '📝 E\'lon qo\'shish') {
+          const webAppResponse = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              chat_id: message.chat.id,
+              text: '📝 Yangi e\'lon qo\'shish uchun quyidagi tugmani bosing:',
+              reply_markup: {
+                inline_keyboard: [
+                  [
+                    {
+                      text: '🌐 E\'lon qo\'shish',
+                      web_app: {
+                        url: `${WEBAPP_URL}/add`
+                      }
+                    }
+                  ]
+                ]
+              }
+            })
+          });
+          
+          if (!webAppResponse.ok) {
+            console.error('Failed to send web app button');
+          }
+        }
       }
     }
 
