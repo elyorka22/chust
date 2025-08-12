@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const BOT_TOKEN = '7648916394:AAHgHed2H1J3qpK01RCujmEhNlzbkQty1F0';
-const WEBAPP_URL = 'http://localhost:3000';
+const WEBAPP_URL = 'https://chust-seven.vercel.app';
 
 export async function POST(request: NextRequest) {
   try {
