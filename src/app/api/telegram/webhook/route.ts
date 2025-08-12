@@ -8,8 +8,23 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('Telegram webhook received:', body);
 
-    const { message } = body;
+    const { message, callback_query } = body;
 
+    // Handle callback queries
+    if (callback_query) {
+      // Forward to callback handler
+      const callbackResponse = await fetch(`${request.nextUrl.origin}/api/telegram/callback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+      
+      return callbackResponse;
+    }
+
+    // Handle regular messages
     if (message?.text === '/start') {
       // Отправляем приветственное сообщение с кнопкой для открытия веб-приложения
       const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -19,29 +34,17 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           chat_id: message.chat.id,
-          text: '🏠 Chust shahri ko\'chmas mulk ilovasiga xush kelibsiz!\n\nBu yerda Chust shahridagi ijara va sotish e\'lonlarini topishingiz mumkin.',
+          text: '🏠 Chust shahri ko\'chmas mulk ilovasiga xush kelibsiz!\n\nBu yerda Chust shahridagi ijara va sotish e\'lonlarini topishingiz mumkin.\n\nXaritani ko\'rish uchun quyidagi havolani bosing:\nhttps://chust-seven.vercel.app',
           reply_markup: {
             inline_keyboard: [
               [
                 {
-                  text: '🗺️ Ko\'chmas mulk xaritasini ochish',
-                  web_app: { url: WEBAPP_URL }
-                }
-              ],
-              [
-                {
-                  text: '📝 Yangi e\'lon qo\'shish',
-                  web_app: { url: `${WEBAPP_URL}/add` }
-                }
-              ],
-              [
-                {
-                  text: '📋 Oddiy foydalanuvchi',
-                  callback_data: 'regular_user'
+                  text: 'ℹ️ Bot haqida',
+                  callback_data: 'about_bot'
                 },
                 {
-                  text: '📝 E\'lon berish',
-                  callback_data: 'post_ad'
+                  text: '👤 Profil',
+                  callback_data: 'profile'
                 }
               ]
             ]
