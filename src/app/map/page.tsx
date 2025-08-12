@@ -1,0 +1,202 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+import { useTelegramApp } from '@/hooks/useTelegramApp';
+import { Listing, Category } from '@/types';
+import CategoryFilter from '@/components/CategoryFilter';
+import SimpleThemeToggle from '@/components/SimpleThemeToggle';
+import { Loader2 } from 'lucide-react';
+
+// Dynamic import of the map to avoid SSR issues
+const DemoMap = dynamic(() => import('@/components/DemoMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-screen flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin" />
+    </div>
+  ),
+});
+
+// Demo data
+const demoCategories: Category[] = [
+  { id: 1, name: 'Аренда', slug: 'rent', created_at: '2024-01-01T00:00:00Z' },
+  { id: 2, name: 'Продажа', slug: 'sale', created_at: '2024-01-01T00:00:00Z' }
+];
+
+const demoListings: Listing[] = [
+  {
+    id: 1,
+    user_id: '1',
+    category_id: 1,
+    title: 'Уютная 2-комнатная квартира в центре',
+    description: 'Современная квартира с ремонтом, мебелью и техникой',
+    price: 500,
+    currency: 'USD',
+    property_type: 'Квартира',
+    area: 65,
+    rooms: 2,
+    floor: 3,
+    total_floors: 5,
+    address: 'ул. Навои, 15',
+    latitude: 40.9977,
+    longitude: 71.2374,
+    contact_phone: '+998 90 123 45 67',
+    contact_email: 'owner1@example.com',
+    is_active: true,
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+    category: demoCategories[0],
+    user: { id: '1', telegram_id: 123456789, first_name: 'Алишер', last_name: 'Каримов', phone: '+998 90 123 45 67', email: 'owner1@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
+  },
+  {
+    id: 2,
+    user_id: '2',
+    category_id: 2,
+    title: 'Дом с участком в тихом районе',
+    description: 'Просторный дом с большим участком, гаражом и садом',
+    price: 85000,
+    currency: 'USD',
+    property_type: 'Дом',
+    area: 120,
+    rooms: 4,
+    floor: 1,
+    total_floors: 1,
+    address: 'ул. Мирзо Улугбека, 45',
+    latitude: 40.9985,
+    longitude: 71.2360,
+    contact_phone: '+998 90 987 65 43',
+    contact_email: 'owner2@example.com',
+    is_active: true,
+    created_at: '2024-01-14T14:30:00Z',
+    updated_at: '2024-01-14T14:30:00Z',
+    category: demoCategories[1],
+    user: { id: '2', telegram_id: 987654321, first_name: 'Мадина', last_name: 'Ахмедова', phone: '+998 90 987 65 43', email: 'owner2@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
+  },
+  {
+    id: 3,
+    user_id: '3',
+    category_id: 1,
+    title: '1-комнатная квартира для студентов',
+    description: 'Компактная квартира рядом с университетом',
+    price: 300,
+    currency: 'USD',
+    property_type: 'Квартира',
+    area: 35,
+    rooms: 1,
+    floor: 2,
+    total_floors: 4,
+    address: 'ул. Алишера Навои, 78',
+    latitude: 40.9965,
+    longitude: 71.2385,
+    contact_phone: '+998 90 555 12 34',
+    contact_email: 'owner3@example.com',
+    is_active: true,
+    created_at: '2024-01-13T09:15:00Z',
+    updated_at: '2024-01-13T09:15:00Z',
+    category: demoCategories[0],
+    user: { id: '3', telegram_id: 555666777, first_name: 'Дилшод', last_name: 'Рахимов', phone: '+998 90 555 12 34', email: 'owner3@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
+  }
+];
+
+export default function MapPage() {
+  const router = useRouter();
+  const { isReady, expand, isTelegramApp } = useTelegramApp();
+  const [selectedCategory, setSelectedCategory] = useState<string>();
+  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark'>('light');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (isReady && isTelegramApp) {
+      expand();
+    }
+  }, [isReady, isTelegramApp, expand]);
+
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleListingClick = (listing: Listing) => {
+    router.push(`/listing/${listing.id}`);
+  };
+
+  const handleCategoryChange = (categorySlug?: string) => {
+    setSelectedCategory(categorySlug);
+  };
+
+  const handleThemeChange = (theme: 'light' | 'dark') => {
+    console.log('Смена темы на:', theme);
+    setSelectedTheme(theme);
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Загрузка объявлений...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-screen">
+      <DemoMap
+        selectedCategory={selectedCategory}
+        onListingClick={handleListingClick}
+        center={[40.9977, 71.2374]} // Чуст координаты
+        zoom={13}
+        theme={selectedTheme}
+      />
+      
+      <CategoryFilter
+        categories={demoCategories}
+        selectedCategory={selectedCategory}
+        onCategoryChange={handleCategoryChange}
+      />
+
+      <SimpleThemeToggle
+        selectedTheme={selectedTheme}
+        onThemeChange={handleThemeChange}
+      />
+      
+      {/* Information Panel */}
+      <div className="absolute bottom-4 left-4 right-4 z-[1000] bg-white rounded-lg shadow-lg p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Недвижимость в Чусте
+            </h2>
+            <p className="text-sm text-gray-600">
+              {demoListings.length} объявлений на карте
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+              <span className="text-xs text-gray-600">Аренда</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="text-xs text-gray-600">Продажа</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Demo Notice */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg shadow-lg">
+        <p className="text-sm font-medium">Демо-режим</p>
+        <p className="text-xs">Тестовые данные для демонстрации</p>
+      </div>
+    </div>
+  );
+} 
