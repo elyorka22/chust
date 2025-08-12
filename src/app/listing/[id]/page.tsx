@@ -112,16 +112,31 @@ export default function ListingDetailPage() {
       
       try {
         setLoading(true);
-        // For demo purposes, use local data
+        
+        // Try to fetch from API first
+        const response = await fetch(`/api/listings/${params.id}`);
+        const data = await response.json();
+        
+        if (response.ok && data.listing) {
+          setListing(data.listing);
+        } else {
+          // Fallback to demo data if API fails
+          const foundListing = demoListings.find(l => l.id.toString() === params.id);
+          if (foundListing) {
+            setListing(foundListing);
+          } else {
+            setListing(null);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching listing:', error);
+        // Fallback to demo data
         const foundListing = demoListings.find(l => l.id.toString() === params.id);
         if (foundListing) {
           setListing(foundListing);
         } else {
           setListing(null);
         }
-      } catch (error) {
-        console.error('Error fetching listing:', error);
-        setListing(null);
       } finally {
         setLoading(false);
       }
@@ -133,7 +148,7 @@ export default function ListingDetailPage() {
   }, [params.id]);
 
   const formatPrice = (price?: number, currency: string = 'USD') => {
-    if (!price) return 'Цена не указана';
+    if (!price) return 'Narx ko\'rsatilmagan';
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
       currency: currency === 'USD' ? 'USD' : 'UZS',
@@ -157,7 +172,7 @@ export default function ListingDetailPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Загрузка объявления...</p>
+          <p className="text-gray-600">E&apos;lon yuklanmoqda...</p>
         </div>
       </div>
     );
@@ -167,7 +182,7 @@ export default function ListingDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Объявление не найдено</p>
+          <p className="text-gray-600">E&apos;lon topilmadi</p>
         </div>
       </div>
     );
@@ -202,7 +217,7 @@ export default function ListingDetailPage() {
           <div className="w-full h-64 bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center">
             <div className="text-center">
               <Home size={48} className="text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-500 text-sm">Фото объекта</p>
+              <p className="text-gray-500 text-sm">Obyekt rasmi</p>
             </div>
           </div>
         </div>
@@ -217,14 +232,14 @@ export default function ListingDetailPage() {
               </span>
             </div>
             <span className="text-sm text-gray-600">
-              {listing.category?.slug === 'rent' ? 'в месяц' : 'за объект'}
+              {listing.category?.slug === 'rent' ? 'oyiga' : 'obyekt uchun'}
             </span>
           </div>
         )}
 
         {/* Details */}
         <div className="bg-white rounded-lg p-4 shadow-sm space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900">Характеристики</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Xususiyatlar</h2>
           
           <div className="grid grid-cols-2 gap-4">
             {listing.property_type && (
@@ -237,14 +252,14 @@ export default function ListingDetailPage() {
             {listing.area && (
               <div className="flex items-center gap-2">
                 <Ruler size={16} className="text-gray-500" />
-                <span className="text-sm text-gray-700">{listing.area} м²</span>
+                <span className="text-sm text-gray-700">{listing.area} m²</span>
               </div>
             )}
             
             {listing.rooms && (
               <div className="flex items-center gap-2">
                 <Users size={16} className="text-gray-500" />
-                <span className="text-sm text-gray-700">{listing.rooms} комнат</span>
+                <span className="text-sm text-gray-700">{listing.rooms} xona</span>
               </div>
             )}
             
@@ -252,7 +267,7 @@ export default function ListingDetailPage() {
               <div className="flex items-center gap-2">
                 <Building2 size={16} className="text-gray-500" />
                 <span className="text-sm text-gray-700">
-                  {listing.floor}{listing.total_floors ? `/${listing.total_floors}` : ''} этаж
+                  {listing.floor}{listing.total_floors ? `/${listing.total_floors}` : ''} qavat
                 </span>
               </div>
             )}
@@ -262,7 +277,7 @@ export default function ListingDetailPage() {
         {/* Description */}
         {listing.description && (
           <div className="bg-white rounded-lg p-4 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Описание</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Tavsif</h2>
             <p className="text-gray-700 leading-relaxed">{listing.description}</p>
           </div>
         )}
@@ -279,12 +294,12 @@ export default function ListingDetailPage() {
 
         {/* Contact Information */}
         <div className="bg-white rounded-lg p-4 shadow-sm space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900">Контакты</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Aloqa</h2>
           
           {listing.user && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Продавец:</span>
+                <span className="text-sm text-gray-600">Sotuvchi:</span>
                 <span className="text-sm font-medium text-gray-900">
                   {listing.user.first_name} {listing.user.last_name}
                 </span>
@@ -296,7 +311,7 @@ export default function ListingDetailPage() {
                   className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Phone size={16} />
-                  Позвонить: {listing.contact_phone}
+                  Qo&apos;ng&apos;iroq qilish: {listing.contact_phone}
                 </button>
               )}
               
@@ -306,7 +321,7 @@ export default function ListingDetailPage() {
                   className="w-full flex items-center justify-center gap-2 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors"
                 >
                   <Mail size={16} />
-                  Написать письмо
+                  Xabar yozish
                 </button>
               )}
             </div>
@@ -317,7 +332,7 @@ export default function ListingDetailPage() {
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Calendar size={16} />
-            <span>Опубликовано: {new Date(listing.created_at).toLocaleDateString('ru-RU')}</span>
+            <span>E&apos;lon berildi: {new Date(listing.created_at).toLocaleDateString('ru-RU')}</span>
           </div>
         </div>
       </div>
