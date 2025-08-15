@@ -74,6 +74,30 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServerClient();
 
+    // Get user by telegram_id (from request headers or body)
+    const telegramId = body.telegram_id || request.headers.get('x-telegram-id');
+    
+    if (!telegramId) {
+      return NextResponse.json(
+        { error: 'Telegram ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Get user from database
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('telegram_id', telegramId)
+      .single();
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'User not found. Please register first.' },
+        { status: 404 }
+      );
+    }
+
     // Get category ID based on slug
     const { data: category } = await supabase
       .from('categories')
@@ -107,7 +131,7 @@ export async function POST(request: NextRequest) {
         contact_phone: body.contact_phone,
         contact_email: null, // No email field anymore
         category_id: category.id,
-        user_id: 'a4207bec-8d62-4e6d-926e-f67a1b6f5ed6', // Use the created demo user ID
+        user_id: user.id, // Use the actual user ID from database
         is_active: true
       })
       .select()

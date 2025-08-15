@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { useTelegramApp } from '@/hooks/useTelegramApp';
 import { Listing, Category } from '@/types';
 import CategoryFilter from '@/components/CategoryFilter';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 
 // Dynamic import of the map to avoid SSR issues
 const DemoMap = dynamic(() => import('@/components/DemoMap'), {
@@ -154,6 +154,15 @@ export default function MapPage() {
               <div className="w-2 h-2 rounded-full bg-green-500"></div>
               <span className="text-xs text-gray-600">Sotish</span>
             </div>
+            
+            {/* Add Listing Button */}
+            <button
+              onClick={() => router.push('/add')}
+              className="flex items-center gap-1 bg-blue-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+            >
+              <Plus size={16} />
+              Qo&apos;shish
+            </button>
           </div>
         </div>
       </div>

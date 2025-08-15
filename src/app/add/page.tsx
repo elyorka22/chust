@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTelegramApp } from '@/hooks/useTelegramApp';
+import { useUser } from '@/hooks/useUser';
 import { ArrowLeft } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -37,6 +38,7 @@ interface FormData {
 export default function AddListingPage() {
   const router = useRouter();
   const { showAlert } = useTelegramApp();
+  const { user, loading: userLoading, error: userError } = useUser();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -77,6 +79,11 @@ export default function AddListingPage() {
       return;
     }
 
+    if (!user) {
+      showAlert('Foydalanuvchi ma\'lumotlari topilmadi. Iltimos, qaytadan urinib ko\'ring.');
+      return;
+    }
+
     setLoading(true);
     
     try {
@@ -85,7 +92,10 @@ export default function AddListingPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          telegram_id: user.telegram_id
+        }),
       });
 
       const result = await response.json();
