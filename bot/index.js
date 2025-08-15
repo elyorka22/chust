@@ -3,6 +3,9 @@ const TelegramBot = require('node-telegram-bot-api');
 // Токен бота
 const token = '7648916394:AAHgHed2H1J3qpK01RCujmEhNlzbkQty1F0';
 
+// URL веб-приложения
+const WEBAPP_URL = 'http://localhost:3000';
+
 // Создаем бота
 const bot = new TelegramBot(token, { polling: true });
 
@@ -18,12 +21,53 @@ bot.setMyCommands([
   { command: '/add', description: 'E\'lon qo\'shish' }
 ]);
 
-// Команда /start
-bot.onText(/\/start/, (msg) => {
+// Автоматическая регистрация пользователя
+async function registerUser(userData) {
+  try {
+    const response = await fetch(`${WEBAPP_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+    
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error('Error registering user:', error);
+    return false;
+  }
+}
+
+// Команда /start - автоматическая регистрация
+bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
+  const user = msg.from;
+  
   console.log('Received /start command from:', chatId);
   
+  // Автоматическая регистрация пользователя
+  const userData = {
+    telegram_id: user.id,
+    username: user.username,
+    first_name: user.first_name,
+    last_name: user.last_name,
+  };
+  
+  console.log('Registering user:', userData);
+  
+  const registrationSuccess = await registerUser(userData);
+  
+  if (registrationSuccess) {
+    console.log('User registered successfully');
+  } else {
+    console.log('User registration failed or user already exists');
+  }
+  
   const message = `👋 Xush kelibs! Chust Real Estate botiga xush kelibsiz!
+
+✅ Siz avtomatik ravishda ro'yxatdan o'tdingiz!
 
 Bu bot orqali siz:
 🏠 Ko'chmas mulk e'lonlarini ko'rishingiz
@@ -35,14 +79,26 @@ Qanday foydalanmoqchisiz?`;
     inline_keyboard: [
       [
         {
-          text: '👤 Oddiy foydalanuvchi',
-          callback_data: 'user_mode'
+          text: '🏠 E\'lonlarni ko\'rish',
+          callback_data: 'view_listings'
         }
       ],
       [
         {
-          text: '📝 E\'lon joylash',
+          text: '📝 E\'lon qo\'shish',
           callback_data: 'add_listing'
+        }
+      ],
+      [
+        {
+          text: '👤 Profil',
+          callback_data: 'profile'
+        }
+      ],
+      [
+        {
+          text: 'ℹ️ Bot haqida',
+          callback_data: 'bot_info'
         }
       ]
     ]
@@ -60,9 +116,9 @@ Qanday foydalanmoqchisiz?`;
 });
 
 // Команда /menu
-bot.onText(/\/menu/, (msg) => {
+bot.onText(/\/menu/, async (msg) => {
   const chatId = msg.chat.id;
-  showMainMenu(chatId);
+  await showMainMenu(chatId);
 });
 
 // Команда /help
@@ -72,87 +128,85 @@ bot.onText(/\/help/, (msg) => {
 });
 
 // Команда /profile
-bot.onText(/\/profile/, (msg) => {
+bot.onText(/\/profile/, async (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-  showProfile(chatId, userId);
+  await showProfile(chatId, userId);
 });
 
-// Команда /listings (только для зарегистрированных)
-bot.onText(/\/listings/, (msg) => {
+// Команда /listings
+bot.onText(/\/listings/, async (msg) => {
   const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  
-  // Проверяем регистрацию (пока всегда false для демо)
-  const isRegistered = false; // Здесь будет проверка из базы данных
-  
-  if (isRegistered) {
-    showListings(chatId);
-  } else {
-    bot.sendMessage(chatId, '❌ Bu buyruq faqat ro\'yxatdan o\'tgan foydalanuvchilar uchun mavjud.');
-  }
+  await showListings(chatId);
 });
 
-// Команда /add (только для зарегистрированных)
-bot.onText(/\/add/, (msg) => {
+// Команда /add
+bot.onText(/\/add/, async (msg) => {
   const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  
-  // Проверяем регистрацию (пока всегда false для демо)
-  const isRegistered = false; // Здесь будет проверка из базы данных
-  
-  if (isRegistered) {
-    showAddListing(chatId);
-  } else {
-    bot.sendMessage(chatId, '❌ Bu buyruq faqat ro\'yxatdan o\'tgan foydalanuvchilar uchun mavjud.\n\nRo\'yxatdan o\'tish uchun /start buyrug\'ini bosing.');
-  }
+  await showAddListing(chatId);
 });
 
 // Обработка кнопок
-bot.on('callback_query', (query) => {
+bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
+  const userId = query.from.id;
   const data = query.data;
 
-  switch (data) {
-    case 'user_mode':
-      showUserMenu(chatId);
-      break;
-      
-    case 'add_listing':
-      showRegistrationPrompt(chatId);
-      break;
-      
-    case 'bot_info':
-      showBotInfo(chatId);
-      break;
-      
-    case 'profile':
-      showProfile(chatId, query.from.id);
-      break;
-      
-    case 'back_to_main':
-      showMainMenu(chatId);
-      break;
-      
-    default:
-      bot.sendMessage(chatId, '❌ Noma\'lum buyruq');
-  }
+  try {
+    switch (data) {
+      case 'view_listings':
+        await openWebApp(chatId, '/map');
+        break;
+        
+      case 'add_listing':
+        await openWebApp(chatId, '/add');
+        break;
+        
+      case 'bot_info':
+        await showBotInfo(chatId);
+        break;
+        
+      case 'profile':
+        await showProfile(chatId, userId);
+        break;
+        
+      case 'back_to_main':
+        await showMainMenu(chatId);
+        break;
+        
+      default:
+        bot.sendMessage(chatId, '❌ Noma\'lum buyruq');
+    }
 
-  bot.answerCallbackQuery(query.id);
+    bot.answerCallbackQuery(query.id);
+  } catch (error) {
+    console.error('Error handling callback:', error);
+    bot.sendMessage(chatId, '❌ Xatolik yuz berdi. Iltimos, qaytadan urinib ko\'ring.');
+  }
 });
 
-// Меню обычного пользователя
-function showUserMenu(chatId) {
-  const message = `👤 Oddiy foydalanuvchi rejimi
+// Главное меню
+async function showMainMenu(chatId) {
+  const message = `👋 Xush kelibs! Chust Real Estate botiga xush kelibsiz!
 
-Siz hozircha ro'yxatdan o'tmagansiz. Quyidagi imkoniyatlar mavjud:`;
+Bu bot orqali siz:
+🏠 Ko'chmas mulk e'lonlarini ko'rishingiz
+📝 O'zingizning e'lonlaringizni joylashtirishingiz mumkin
+
+Qanday foydalanmoqchisiz?`;
 
   const keyboard = {
     inline_keyboard: [
       [
         {
-          text: 'ℹ️ Bot haqida',
-          callback_data: 'bot_info'
+          text: '🏠 E\'lonlarni ko\'rish',
+          callback_data: 'view_listings'
+        }
+      ],
+      [
+        {
+          text: '📝 E\'lon qo\'shish',
+          callback_data: 'add_listing'
         }
       ],
       [
@@ -163,36 +217,8 @@ Siz hozircha ro'yxatdan o'tmagansiz. Quyidagi imkoniyatlar mavjud:`;
       ],
       [
         {
-          text: '🔙 Bosh menyuga qaytish',
-          callback_data: 'back_to_main'
-        }
-      ]
-    ]
-  };
-
-  bot.sendMessage(chatId, message, {
-    reply_markup: keyboard
-  });
-}
-
-// Запрос регистрации
-function showRegistrationPrompt(chatId) {
-  const message = `📝 E'lon joylash uchun ro'yxatdan o'tish kerak
-
-E'lon joylash uchun avval ro'yxatdan o'tishingiz kerak.`;
-
-  const keyboard = {
-    inline_keyboard: [
-      [
-        {
-          text: '✅ Ro\'yxatdan o\'tish',
-          callback_data: 'register'
-        }
-      ],
-      [
-        {
-          text: '🔙 Bosh menyuga qaytish',
-          callback_data: 'back_to_main'
+          text: 'ℹ️ Bot haqida',
+          callback_data: 'bot_info'
         }
       ]
     ]
@@ -204,7 +230,7 @@ E'lon joylash uchun avval ro'yxatdan o'tishingiz kerak.`;
 }
 
 // Информация о боте
-function showBotInfo(chatId) {
+async function showBotInfo(chatId) {
   const message = `ℹ️ Bot haqida
 
 🏠 Chust Real Estate Bot
@@ -222,7 +248,7 @@ Bu bot orqali siz:
       [
         {
           text: '🔙 Orqaga qaytish',
-          callback_data: 'back_to_menu'
+          callback_data: 'back_to_main'
         }
       ]
     ]
@@ -234,52 +260,20 @@ Bu bot orqali siz:
 }
 
 // Профиль пользователя
-function showProfile(chatId, userId) {
+async function showProfile(chatId, userId) {
   const message = `👤 Profil ma'lumotlari
 
 📱 Telegram ID: ${userId}
-📅 Holat: Ro'yxatdan o'tilmagan
+✅ Holat: Ro'yxatdan o'tgan
 
-Ro'yxatdan o'tish uchun "E'lon joylash" tugmasini bosing.`;
+Siz avtomatik ravishda ro'yxatdan o'tgansiz va e'lonlar qo'shishingiz mumkin.`;
 
   const keyboard = {
     inline_keyboard: [
       [
         {
           text: '🔙 Orqaga qaytish',
-          callback_data: 'back_to_menu'
-        }
-      ]
-    ]
-  };
-
-  bot.sendMessage(chatId, message, {
-    reply_markup: keyboard
-  });
-}
-
-// Главное меню
-function showMainMenu(chatId) {
-  const message = `👋 Xush kelibs! Chust Real Estate botiga xush kelibsiz!
-
-Bu bot orqali siz:
-🏠 Ko'chmas mulk e'lonlarini ko'rishingiz
-📝 O'zingizning e'lonlaringizni joylashtirishingiz mumkin
-
-Qanday foydalanmoqchisiz?`;
-
-  const keyboard = {
-    inline_keyboard: [
-      [
-        {
-          text: '👤 Oddiy foydalanuvchi',
-          callback_data: 'user_mode'
-        }
-      ],
-      [
-        {
-          text: '📝 E\'lon joylash',
-          callback_data: 'add_listing'
+          callback_data: 'back_to_main'
         }
       ]
     ]
@@ -296,14 +290,14 @@ function showHelp(chatId) {
 
 📋 Mavjud buyruqlar:
 
-/start - Botni boshlash
+/start - Botni boshlash va ro'yxatdan o'tish
 /menu - Bosh menyu
 /help - Yordam
 /profile - Profil ma'lumotlari
-
-👤 Ro'yxatdan o'tgan foydalanuvchilar uchun:
 /listings - E'lonlarni ko'rish
 /add - E'lon qo'shish
+
+✅ Barcha foydalanuvchilar e'lonlar qo'shishi mumkin!
 
 ❓ Savollaringiz bo'lsa, @admin_username ga murojaat qiling.`;
 
@@ -311,31 +305,22 @@ function showHelp(chatId) {
 }
 
 // Показать объявления
-function showListings(chatId) {
+async function showListings(chatId) {
   const message = `🏠 E'lonlarni ko'rish
 
-Hozircha e'lonlar mavjud emas.
-
-E'lon qo'shish uchun /add buyrug\'ini bosing.`;
-
-  bot.sendMessage(chatId, message);
-}
-
-// Добавить объявление
-function showAddListing(chatId) {
-  const message = `📝 E'lon qo'shish
-
-E'lon qo'shish uchun veb-ilovani oching:
-
-🌐 https://your-domain.com/add
-
-Yoki bosh menyuga qayting va "E'lon joylash" tugmasini bosing.`;
+E'lonlarni ko'rish uchun veb-ilovani oching:`;
 
   const keyboard = {
     inline_keyboard: [
       [
         {
-          text: '🔙 Bosh menyuga qaytish',
+          text: '🌐 E\'lonlarni ko\'rish',
+          web_app: { url: `${WEBAPP_URL}/map` }
+        }
+      ],
+      [
+        {
+          text: '🔙 Orqaga qaytish',
           callback_data: 'back_to_main'
         }
       ]
@@ -344,6 +329,51 @@ Yoki bosh menyuga qayting va "E'lon joylash" tugmasini bosing.`;
 
   bot.sendMessage(chatId, message, {
     reply_markup: keyboard
+  });
+}
+
+// Добавить объявление
+async function showAddListing(chatId) {
+  const message = `📝 E'lon qo'shish
+
+E'lon qo'shish uchun veb-ilovani oching:`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: '🌐 E\'lon qo\'shish',
+          web_app: { url: `${WEBAPP_URL}/add` }
+        }
+      ],
+      [
+        {
+          text: '🔙 Orqaga qaytish',
+          callback_data: 'back_to_main'
+        }
+      ]
+    ]
+  };
+
+  bot.sendMessage(chatId, message, {
+    reply_markup: keyboard
+  });
+}
+
+// Открыть веб-приложение
+async function openWebApp(chatId, url) {
+  const webAppUrl = `${WEBAPP_URL}${url}`;
+  bot.sendMessage(chatId, `🌐 Sizni ${webAppUrl} saytiga yo'naltiramiz.`, {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: 'Web-saytga o\'tish',
+            web_app: { url: webAppUrl }
+          }
+        ]
+      ]
+    }
   });
 }
 
