@@ -1,12 +1,13 @@
 const TelegramBot = require('node-telegram-bot-api');
-require('dotenv').config();
 
-// Замените на ваш токен бота
-const token = process.env.TELEGRAM_BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE';
+// ВАЖНО: Замените на ваш токен бота от @BotFather
+const token = '7648916394:AAHgHed2H1J3qpK01RCujmEhNlzbkQty1F0';
+
+// URL вашего веб-приложения (замените на ваш домен)
+const WEBAPP_URL = 'http://localhost:3000'; // Для разработки
+
+// Создаем экземпляр бота
 const bot = new TelegramBot(token, { polling: true });
-
-// URL вашего веб-приложения
-const WEBAPP_URL = process.env.WEBAPP_URL || 'https://your-domain.com';
 
 // Состояния пользователей
 const userStates = new Map();
