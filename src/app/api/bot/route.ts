@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Импортируем бота
-const TelegramBot = require('node-telegram-bot-api');
+import TelegramBot from 'node-telegram-bot-api';
 
 // Токен бота
 const token = '7648916394:AAHgHed2H1J3qpK01RCujmEhNlzbkQty1F0';
@@ -15,7 +13,12 @@ const WEBAPP_URL = process.env.VERCEL_URL
 const bot = new TelegramBot(token, { polling: false }); // Отключаем polling для Vercel
 
 // Автоматическая регистрация пользователя
-async function registerUser(userData: any) {
+async function registerUser(userData: {
+  telegram_id: number;
+  username?: string;
+  first_name: string;
+  last_name?: string;
+}) {
   try {
     const response = await fetch(`${WEBAPP_URL}/api/auth/register`, {
       method: 'POST',

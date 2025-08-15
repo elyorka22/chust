@@ -38,7 +38,7 @@ interface FormData {
 export default function AddListingPage() {
   const router = useRouter();
   const { showAlert } = useTelegramApp();
-  const { user, loading: userLoading, error: userError } = useUser();
+  const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     title: '',

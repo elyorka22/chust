@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const supabase = createServerClient();
 
     // Check if user already exists
-    const { data: existingUser, error: checkError } = await supabase
+    const { data: existingUser } = await supabase
       .from('users')
       .select('*')
       .eq('telegram_id', body.telegram_id)
