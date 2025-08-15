@@ -11,6 +11,7 @@ console.log('Bot started...');
 // Команда /start
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
+  console.log('Received /start command from:', chatId);
   
   const message = `👋 Xush kelibs! Chust Real Estate botiga xush kelibsiz!
 
@@ -37,8 +38,14 @@ Qanday foydalanmoqchisiz?`;
     ]
   };
 
+  console.log('Sending message with keyboard...');
+  
   bot.sendMessage(chatId, message, {
     reply_markup: keyboard
+  }).then(() => {
+    console.log('Message sent successfully');
+  }).catch((error) => {
+    console.error('Error sending message:', error);
   });
 });
 
