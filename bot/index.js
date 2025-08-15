@@ -8,6 +8,16 @@ const bot = new TelegramBot(token, { polling: true });
 
 console.log('Bot started...');
 
+// Устанавливаем команды бота
+bot.setMyCommands([
+  { command: '/start', description: 'Boshlash' },
+  { command: '/menu', description: 'Bosh menyu' },
+  { command: '/help', description: 'Yordam' },
+  { command: '/profile', description: 'Profil' },
+  { command: '/listings', description: 'E\'lonlarni ko\'rish' },
+  { command: '/add', description: 'E\'lon qo\'shish' }
+]);
+
 // Команда /start
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
@@ -47,6 +57,55 @@ Qanday foydalanmoqchisiz?`;
   }).catch((error) => {
     console.error('Error sending message:', error);
   });
+});
+
+// Команда /menu
+bot.onText(/\/menu/, (msg) => {
+  const chatId = msg.chat.id;
+  showMainMenu(chatId);
+});
+
+// Команда /help
+bot.onText(/\/help/, (msg) => {
+  const chatId = msg.chat.id;
+  showHelp(chatId);
+});
+
+// Команда /profile
+bot.onText(/\/profile/, (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+  showProfile(chatId, userId);
+});
+
+// Команда /listings (только для зарегистрированных)
+bot.onText(/\/listings/, (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+  
+  // Проверяем регистрацию (пока всегда false для демо)
+  const isRegistered = false; // Здесь будет проверка из базы данных
+  
+  if (isRegistered) {
+    showListings(chatId);
+  } else {
+    bot.sendMessage(chatId, '❌ Bu buyruq faqat ro\'yxatdan o\'tgan foydalanuvchilar uchun mavjud.');
+  }
+});
+
+// Команда /add (только для зарегистрированных)
+bot.onText(/\/add/, (msg) => {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+  
+  // Проверяем регистрацию (пока всегда false для демо)
+  const isRegistered = false; // Здесь будет проверка из базы данных
+  
+  if (isRegistered) {
+    showAddListing(chatId);
+  } else {
+    bot.sendMessage(chatId, '❌ Bu buyruq faqat ro\'yxatdan o\'tgan foydalanuvchilar uchun mavjud.\n\nRo\'yxatdan o\'tish uchun /start buyrug\'ini bosing.');
+  }
 });
 
 // Обработка кнопок
@@ -221,6 +280,63 @@ Qanday foydalanmoqchisiz?`;
         {
           text: '📝 E\'lon joylash',
           callback_data: 'add_listing'
+        }
+      ]
+    ]
+  };
+
+  bot.sendMessage(chatId, message, {
+    reply_markup: keyboard
+  });
+}
+
+// Помощь
+function showHelp(chatId) {
+  const message = `🆘 Yordam
+
+📋 Mavjud buyruqlar:
+
+/start - Botni boshlash
+/menu - Bosh menyu
+/help - Yordam
+/profile - Profil ma'lumotlari
+
+👤 Ro'yxatdan o'tgan foydalanuvchilar uchun:
+/listings - E'lonlarni ko'rish
+/add - E'lon qo'shish
+
+❓ Savollaringiz bo'lsa, @admin_username ga murojaat qiling.`;
+
+  bot.sendMessage(chatId, message);
+}
+
+// Показать объявления
+function showListings(chatId) {
+  const message = `🏠 E'lonlarni ko'rish
+
+Hozircha e'lonlar mavjud emas.
+
+E'lon qo'shish uchun /add buyrug\'ini bosing.`;
+
+  bot.sendMessage(chatId, message);
+}
+
+// Добавить объявление
+function showAddListing(chatId) {
+  const message = `📝 E'lon qo'shish
+
+E'lon qo'shish uchun veb-ilovani oching:
+
+🌐 https://your-domain.com/add
+
+Yoki bosh menyuga qayting va "E'lon joylash" tugmasini bosing.`;
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: '🔙 Bosh menyuga qaytish',
+          callback_data: 'back_to_main'
         }
       ]
     ]
