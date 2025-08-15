@@ -2,85 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
 import { Listing } from '@/types';
 
-// Demo data for fallback
-const demoListings = [
-  {
-    id: 1,
-    user_id: '1',
-    category_id: 1,
-    title: 'Markazdagi 2 xonali kvartira',
-    description: 'Zamonaviy jihozlangan va mebellangan kvartira',
-    price: 500,
-    currency: 'USD',
-    property_type: 'Kvartira',
-    area: 65,
-    rooms: 2,
-    floor: 3,
-    total_floors: 5,
-    address: 'Navoiy ko\'chasi, 15',
-    latitude: 40.9977,
-    longitude: 71.2374,
-    contact_phone: '+998 90 123 45 67',
-    contact_email: 'owner1@example.com',
-    is_active: true,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
-    category: { id: 1, name: 'Ijara', slug: 'rent', created_at: '2024-01-01T00:00:00Z' },
-    user: { id: '1', telegram_id: 123456789, first_name: 'Alisher', last_name: 'Karimov', phone: '+998 90 123 45 67', email: 'owner1@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
-  },
-  {
-    id: 2,
-    user_id: '2',
-    category_id: 2,
-    title: 'Hovli va bog\'li uy',
-    description: 'Katta hovli va garajli uy, bog\' bilan',
-    price: 85000,
-    currency: 'USD',
-    property_type: 'Uy',
-    area: 120,
-    rooms: 4,
-    floor: 1,
-    total_floors: 1,
-    address: 'Mirzo Ulug\'bek ko\'chasi, 45',
-    latitude: 40.9985,
-    longitude: 71.2360,
-    contact_phone: '+998 90 987 65 43',
-    contact_email: 'owner2@example.com',
-    is_active: true,
-    created_at: '2024-01-14T14:30:00Z',
-    updated_at: '2024-01-14T14:30:00Z',
-    category: { id: 2, name: 'Sotish', slug: 'sale', created_at: '2024-01-01T00:00:00Z' },
-    user: { id: '2', telegram_id: 987654321, first_name: 'Madina', last_name: 'Axmedova', phone: '+998 90 987 65 43', email: 'owner2@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
-  },
-  {
-    id: 3,
-    user_id: '3',
-    category_id: 1,
-    title: 'Talabalar uchun 1 xonali kvartira',
-    description: 'Universitet yonida joylashgan ixcham kvartira',
-    price: 300,
-    currency: 'USD',
-    property_type: 'Kvartira',
-    area: 35,
-    rooms: 1,
-    floor: 2,
-    total_floors: 4,
-    address: 'Alisher Navoiy ko\'chasi, 78',
-    latitude: 40.9965,
-    longitude: 71.2385,
-    contact_phone: '+998 90 555 12 34',
-    contact_email: 'owner3@example.com',
-    is_active: true,
-    created_at: '2024-01-13T09:15:00Z',
-    updated_at: '2024-01-13T09:15:00Z',
-    category: { id: 1, name: 'Ijara', slug: 'rent', created_at: '2024-01-01T00:00:00Z' },
-    user: { id: '3', telegram_id: 555666777, first_name: 'Dilshod', last_name: 'Raximov', phone: '+998 90 555 12 34', email: 'owner3@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
-  }
-];
-
-// In-memory storage for demo mode
-const demoStorage: Listing[] = [...demoListings];
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -90,17 +11,10 @@ export async function GET(request: NextRequest) {
 
     // Check if Supabase is configured
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.warn('Supabase environment variables not found, using demo data');
-      
-      let filteredListings = demoStorage;
-      if (category) {
-        filteredListings = demoStorage.filter(listing => listing.category.slug === category);
-      }
-      
-      return NextResponse.json({
-        listings: filteredListings.slice(offset, offset + limit),
-        total: filteredListings.length
-      });
+      return NextResponse.json(
+        { error: 'Database configuration not found' },
+        { status: 500 }
+      );
     }
 
     const supabase = createServerClient();
@@ -152,56 +66,10 @@ export async function POST(request: NextRequest) {
 
     // Check if Supabase is configured
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.warn('Supabase environment variables not found, using demo mode');
-      
-      // In demo mode, create a new listing and add to storage
-      const newListing: Listing = {
-        id: Math.floor(Math.random() * 10000) + 1000,
-        user_id: 'demo_user',
-        category_id: body.category === 'rent' ? 1 : 2,
-        title: body.title,
-        description: body.description || '',
-        price: parseFloat(body.price),
-        currency: body.currency || 'USD',
-        property_type: body.property_type || 'Kvartira',
-        area: body.area ? parseFloat(body.area) : undefined,
-        rooms: body.rooms ? parseInt(body.rooms) : undefined,
-        floor: body.floor ? parseInt(body.floor) : undefined,
-        total_floors: body.total_floors ? parseInt(body.total_floors) : undefined,
-        address: `Lat: ${body.latitude || 40.9977}, Lng: ${body.longitude || 71.2374}`,
-        latitude: body.latitude || 40.9977,
-        longitude: body.longitude || 71.2374,
-        contact_phone: body.contact_phone,
-        contact_email: undefined,
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        category: { 
-          id: body.category === 'rent' ? 1 : 2, 
-          name: body.category === 'rent' ? 'Ijara' : 'Sotish', 
-          slug: body.category, 
-          created_at: '2024-01-01T00:00:00Z' 
-        },
-        user: { 
-          id: 'demo_user', 
-          telegram_id: 123456789, 
-          first_name: 'Demo', 
-          last_name: 'User', 
-          phone: body.contact_phone, 
-          email: undefined, 
-          is_verified: true, 
-          created_at: '2024-01-01T00:00:00Z', 
-          updated_at: '2024-01-01T00:00:00Z' 
-        }
-      };
-      
-      demoStorage.push(newListing); // Add to in-memory storage
-      
-      return NextResponse.json({
-        success: true,
-        listing: newListing,
-        message: 'Demo mode: Listing saved successfully'
-      });
+      return NextResponse.json(
+        { error: 'Database configuration not found' },
+        { status: 500 }
+      );
     }
 
     const supabase = createServerClient();
@@ -239,7 +107,7 @@ export async function POST(request: NextRequest) {
         contact_phone: body.contact_phone,
         contact_email: null, // No email field anymore
         category_id: category.id,
-        user_id: 'demo_user', // TODO: Get from authenticated user
+        user_id: 'demo_user', // TODO: Get from authenticated user session
         is_active: true
       })
       .select()

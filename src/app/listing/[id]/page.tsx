@@ -17,88 +17,13 @@ import {
   DollarSign
 } from 'lucide-react';
 
-// Demo data
-const demoListings: Listing[] = [
-  {
-    id: 1,
-    user_id: '1',
-    category_id: 1,
-    title: 'Уютная 2-комнатная квартира в центре',
-    description: 'Современная квартира с ремонтом, мебелью и техникой. Идеально подходит для семьи или молодой пары. Квартира находится в тихом районе, но в шаговой доступности от центра города. Рядом есть магазины, школы, детские сады и остановки общественного транспорта.',
-    price: 500,
-    currency: 'USD',
-    property_type: 'Квартира',
-    area: 65,
-    rooms: 2,
-    floor: 3,
-    total_floors: 5,
-    address: 'ул. Навои, 15, Чуст, Наманганская область',
-    latitude: 40.9977,
-    longitude: 71.2374,
-    contact_phone: '+998 90 123 45 67',
-    contact_email: 'owner1@example.com',
-    is_active: true,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
-    category: { id: 1, name: 'Аренда', slug: 'rent', created_at: '2024-01-01T00:00:00Z' },
-    user: { id: '1', telegram_id: 123456789, first_name: 'Алишер', last_name: 'Каримов', phone: '+998 90 123 45 67', email: 'owner1@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
-  },
-  {
-    id: 2,
-    user_id: '2',
-    category_id: 2,
-    title: 'Дом с участком в тихом районе',
-    description: 'Просторный дом с большим участком, гаражом и садом. Отличный вариант для большой семьи. Дом построен из качественных материалов, имеет все необходимые коммуникации. На участке есть фруктовые деревья и место для огорода.',
-    price: 85000,
-    currency: 'USD',
-    property_type: 'Дом',
-    area: 120,
-    rooms: 4,
-    floor: 1,
-    total_floors: 1,
-    address: 'ул. Мирзо Улугбека, 45, Чуст, Наманганская область',
-    latitude: 40.9985,
-    longitude: 71.2360,
-    contact_phone: '+998 90 987 65 43',
-    contact_email: 'owner2@example.com',
-    is_active: true,
-    created_at: '2024-01-14T14:30:00Z',
-    updated_at: '2024-01-14T14:30:00Z',
-    category: { id: 2, name: 'Продажа', slug: 'sale', created_at: '2024-01-01T00:00:00Z' },
-    user: { id: '2', telegram_id: 987654321, first_name: 'Мадина', last_name: 'Ахмедова', phone: '+998 90 987 65 43', email: 'owner2@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
-  },
-  {
-    id: 3,
-    user_id: '3',
-    category_id: 1,
-    title: '1-комнатная квартира для студентов',
-    description: 'Компактная квартира рядом с университетом. Идеально подходит для студентов или молодых специалистов. Квартира меблирована, есть вся необходимая техника. Рядом университет, библиотека, кафе и магазины.',
-    price: 300,
-    currency: 'USD',
-    property_type: 'Квартира',
-    area: 35,
-    rooms: 1,
-    floor: 2,
-    total_floors: 4,
-    address: 'ул. Алишера Навои, 78, Чуст, Наманганская область',
-    latitude: 40.9965,
-    longitude: 71.2385,
-    contact_phone: '+998 90 555 12 34',
-    contact_email: 'owner3@example.com',
-    is_active: true,
-    created_at: '2024-01-13T09:15:00Z',
-    updated_at: '2024-01-13T09:15:00Z',
-    category: { id: 1, name: 'Аренда', slug: 'rent', created_at: '2024-01-01T00:00:00Z' },
-    user: { id: '3', telegram_id: 555666777, first_name: 'Дилшод', last_name: 'Рахимов', phone: '+998 90 555 12 34', email: 'owner3@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
-  }
-];
-
 export default function ListingDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { isReady, expand, isTelegramApp } = useTelegramApp();
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isReady && isTelegramApp) {
@@ -112,31 +37,28 @@ export default function ListingDetailPage() {
       
       try {
         setLoading(true);
+        setError(null);
         
-        // Try to fetch from API first
         const response = await fetch(`/api/listings/${params.id}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Объявление не найдено');
+          }
+          throw new Error('Ошибка загрузки объявления');
+        }
+        
         const data = await response.json();
         
-        if (response.ok && data.listing) {
-          setListing(data.listing);
-        } else {
-          // Fallback to demo data if API fails
-          const foundListing = demoListings.find(l => l.id.toString() === params.id);
-          if (foundListing) {
-            setListing(foundListing);
-          } else {
-            setListing(null);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching listing:', error);
-        // Fallback to demo data
-        const foundListing = demoListings.find(l => l.id.toString() === params.id);
-        if (foundListing) {
-          setListing(foundListing);
+        if (data.data) {
+          setListing(data.data);
         } else {
           setListing(null);
         }
+      } catch (error) {
+        console.error('Error fetching listing:', error);
+        setError(error instanceof Error ? error.message : 'Ошибка загрузки');
+        setListing(null);
       } finally {
         setLoading(false);
       }
@@ -148,41 +70,46 @@ export default function ListingDetailPage() {
   }, [params.id]);
 
   const formatPrice = (price?: number, currency: string = 'USD') => {
-    if (!price) return 'Narx ko\'rsatilmagan';
+    if (!price) return 'Цена не указана';
+    
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
-      currency: currency === 'USD' ? 'USD' : 'UZS',
+      currency: currency,
+      minimumFractionDigits: 0,
     }).format(price);
   };
 
-  const handleCall = () => {
-    if (listing?.contact_phone) {
-      window.open(`tel:${listing.contact_phone}`, '_blank');
-    }
-  };
-
-  const handleEmail = () => {
-    if (listing?.contact_email) {
-      window.open(`mailto:${listing.contact_email}`, '_blank');
-    }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">E&apos;lon yuklanmoqda...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yuklanmoqda...</p>
         </div>
       </div>
     );
   }
 
-  if (!listing) {
+  if (error || !listing) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">E&apos;lon topilmadi</p>
+          <p className="text-red-600 mb-2">Xatolik yuz berdi</p>
+          <p className="text-gray-600 text-sm mb-4">{error || 'Объявление не найдено'}</p>
+          <button
+            onClick={() => router.back()}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+          >
+            Orqaga qaytish
+          </button>
         </div>
       </div>
     );
@@ -191,148 +118,192 @@ export default function ListingDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="flex items-center p-4">
-          <button
-            onClick={() => router.back()}
-            className="p-2 rounded-full hover:bg-gray-100 mr-3"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-lg font-semibold text-gray-900">
-              {listing.title}
-            </h1>
-            <p className="text-sm text-gray-600">
-              {listing.category?.name}
-            </p>
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.back()}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900 line-clamp-1">
+                {listing.title}
+              </h1>
+              <p className="text-sm text-gray-600">
+                {listing.category?.name} • {listing.property_type}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="p-4 space-y-6">
-        {/* Demo Image */}
-        <div className="bg-white rounded-lg overflow-hidden shadow-sm">
-          <div className="w-full h-64 bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center">
-            <div className="text-center">
-              <Home size={48} className="text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-500 text-sm">Obyekt rasmi</p>
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Image Placeholder */}
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="aspect-video bg-gray-200 flex items-center justify-center">
+                <div className="text-center">
+                  <Home className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-500">Rasm mavjud emas</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                Tavsif
+              </h2>
+              <p className="text-gray-700 leading-relaxed">
+                {listing.description || 'Tavsif mavjud emas'}
+              </p>
+            </div>
+
+            {/* Details */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                Xususiyatlar
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {listing.area && (
+                  <div className="flex items-center gap-2">
+                    <Ruler className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">
+                      Maydoni: {listing.area} m²
+                    </span>
+                  </div>
+                )}
+                {listing.rooms && (
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">
+                      Xonalar: {listing.rooms}
+                    </span>
+                  </div>
+                )}
+                {listing.floor && (
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">
+                      Qavat: {listing.floor}
+                      {listing.total_floors && `/${listing.total_floors}`}
+                    </span>
+                  </div>
+                )}
+                {listing.address && (
+                  <div className="flex items-center gap-2 col-span-2 md:col-span-3">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">
+                      Manzil: {listing.address}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Price */}
-        {listing.price && (
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <DollarSign className="text-green-600" size={20} />
-              <span className="text-2xl font-bold text-green-600">
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Price Card */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="w-5 h-5 text-green-600" />
+                <span className="text-sm text-gray-600">Narxi</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900 mb-2">
                 {formatPrice(listing.price, listing.currency)}
-              </span>
+              </div>
+              <p className="text-sm text-gray-600">
+                {listing.category?.name === 'rent' ? 'oyiga' : 'umumiy'}
+              </p>
             </div>
-            <span className="text-sm text-gray-600">
-              {listing.category?.slug === 'rent' ? 'oyiga' : 'obyekt uchun'}
-            </span>
-          </div>
-        )}
 
-        {/* Details */}
-        <div className="bg-white rounded-lg p-4 shadow-sm space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900">Xususiyatlar</h2>
-          
-          <div className="grid grid-cols-2 gap-4">
-            {listing.property_type && (
-              <div className="flex items-center gap-2">
-                <Home size={16} className="text-gray-500" />
-                <span className="text-sm text-gray-700">{listing.property_type}</span>
+            {/* Contact Info */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Bog&apos;lanish
+              </h3>
+              <div className="space-y-3">
+                {listing.contact_phone && (
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    <a
+                      href={`tel:${listing.contact_phone}`}
+                      className="text-blue-600 hover:text-blue-700 text-sm"
+                    >
+                      {listing.contact_phone}
+                    </a>
+                  </div>
+                )}
+                {listing.contact_email && (
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-4 h-4 text-gray-400" />
+                    <a
+                      href={`mailto:${listing.contact_email}`}
+                      className="text-blue-600 hover:text-blue-700 text-sm"
+                    >
+                      {listing.contact_email}
+                    </a>
+                  </div>
+                )}
               </div>
-            )}
-            
-            {listing.area && (
-              <div className="flex items-center gap-2">
-                <Ruler size={16} className="text-gray-500" />
-                <span className="text-sm text-gray-700">{listing.area} m²</span>
-              </div>
-            )}
-            
-            {listing.rooms && (
-              <div className="flex items-center gap-2">
-                <Users size={16} className="text-gray-500" />
-                <span className="text-sm text-gray-700">{listing.rooms} xona</span>
-              </div>
-            )}
-            
-            {listing.floor && (
-              <div className="flex items-center gap-2">
-                <Building2 size={16} className="text-gray-500" />
-                <span className="text-sm text-gray-700">
-                  {listing.floor}{listing.total_floors ? `/${listing.total_floors}` : ''} qavat
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Description */}
-        {listing.description && (
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Tavsif</h2>
-            <p className="text-gray-700 leading-relaxed">{listing.description}</p>
-          </div>
-        )}
-
-        {/* Address */}
-        {listing.address && (
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <div className="flex items-start gap-2">
-              <MapPin size={16} className="text-gray-500 mt-0.5" />
-              <span className="text-sm text-gray-700">{listing.address}</span>
             </div>
-          </div>
-        )}
 
-        {/* Contact Information */}
-        <div className="bg-white rounded-lg p-4 shadow-sm space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900">Aloqa</h2>
-          
-          {listing.user && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Sotuvchi:</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {listing.user.first_name} {listing.user.last_name}
-                </span>
+            {/* Owner Info */}
+            {listing.user && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Egasi
+                </h3>
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600">
+                    {listing.user.first_name} {listing.user.last_name}
+                  </p>
+                  {listing.user.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-3 h-3 text-gray-400" />
+                      <a
+                        href={`tel:${listing.user.phone}`}
+                        className="text-blue-600 hover:text-blue-700 text-sm"
+                      >
+                        {listing.user.phone}
+                      </a>
+                    </div>
+                  )}
+                  {listing.user.is_verified && (
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-xs text-green-600">Tasdiqlangan</span>
+                    </div>
+                  )}
+                </div>
               </div>
-              
-              {listing.contact_phone && (
-                <button
-                  onClick={handleCall}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Phone size={16} />
-                  Qo&apos;ng&apos;iroq qilish: {listing.contact_phone}
-                </button>
-              )}
-              
-              {listing.contact_email && (
-                <button
-                  onClick={handleEmail}
-                  className="w-full flex items-center justify-center gap-2 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  <Mail size={16} />
-                  Xabar yozish
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+            )}
 
-        {/* Date */}
-        <div className="bg-white rounded-lg p-4 shadow-sm">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Calendar size={16} />
-            <span>E&apos;lon berildi: {new Date(listing.created_at).toLocaleDateString('ru-RU')}</span>
+            {/* Listing Info */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                E&apos;lon ma&apos;lumotlari
+              </h3>
+              <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-gray-400" />
+                  <span>Qo&apos;shilgan: {formatDate(listing.created_at)}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Home className="w-4 h-4 text-gray-400" />
+                  <span>Turi: {listing.property_type}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-gray-400" />
+                  <span>Kategoriya: {listing.category?.name}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

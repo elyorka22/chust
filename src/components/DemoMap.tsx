@@ -14,82 +14,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Demo data
-const demoListings: Listing[] = [
-  {
-    id: 1,
-    user_id: '1',
-    category_id: 1,
-    title: 'Markazdagi 2 xonali kvartira',
-    description: 'Zamonaviy jihozlangan va mebellangan kvartira',
-    price: 500,
-    currency: 'USD',
-    property_type: 'Kvartira',
-    area: 65,
-    rooms: 2,
-    floor: 3,
-    total_floors: 5,
-    address: 'Navoiy ko\'chasi, 15',
-    latitude: 40.9977,
-    longitude: 71.2374,
-    contact_phone: '+998 90 123 45 67',
-    contact_email: 'owner1@example.com',
-    is_active: true,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
-    category: { id: 1, name: 'Ijara', slug: 'rent', created_at: '2024-01-01T00:00:00Z' },
-    user: { id: '1', telegram_id: 123456789, first_name: 'Alisher', last_name: 'Karimov', phone: '+998 90 123 45 67', email: 'owner1@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
-  },
-  {
-    id: 2,
-    user_id: '2',
-    category_id: 2,
-    title: 'Hovli va bog\'li uy',
-    description: 'Katta hovli va garajli uy, bog\' bilan',
-    price: 85000,
-    currency: 'USD',
-    property_type: 'Uy',
-    area: 120,
-    rooms: 4,
-    floor: 1,
-    total_floors: 1,
-    address: 'Mirzo Ulug\'bek ko\'chasi, 45',
-    latitude: 40.9985,
-    longitude: 71.2360,
-    contact_phone: '+998 90 987 65 43',
-    contact_email: 'owner2@example.com',
-    is_active: true,
-    created_at: '2024-01-14T14:30:00Z',
-    updated_at: '2024-01-14T14:30:00Z',
-    category: { id: 2, name: 'Sotish', slug: 'sale', created_at: '2024-01-01T00:00:00Z' },
-    user: { id: '2', telegram_id: 987654321, first_name: 'Madina', last_name: 'Axmedova', phone: '+998 90 987 65 43', email: 'owner2@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
-  },
-  {
-    id: 3,
-    user_id: '3',
-    category_id: 1,
-    title: 'Talabalar uchun 1 xonali kvartira',
-    description: 'Universitet yonida joylashgan ixcham kvartira',
-    price: 300,
-    currency: 'USD',
-    property_type: 'Kvartira',
-    area: 35,
-    rooms: 1,
-    floor: 2,
-    total_floors: 4,
-    address: 'Alisher Navoiy ko\'chasi, 78',
-    latitude: 40.9965,
-    longitude: 71.2385,
-    contact_phone: '+998 90 555 12 34',
-    contact_email: 'owner3@example.com',
-    is_active: true,
-    created_at: '2024-01-13T09:15:00Z',
-    updated_at: '2024-01-13T09:15:00Z',
-    category: { id: 1, name: 'Ijara', slug: 'rent', created_at: '2024-01-01T00:00:00Z' },
-    user: { id: '3', telegram_id: 555666777, first_name: 'Dilshod', last_name: 'Raximov', phone: '+998 90 555 12 34', email: 'owner3@example.com', is_verified: true, created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-01T00:00:00Z' }
-  }
-];
-
 interface DemoMapProps {
   selectedCategory?: string;
   onListingClick?: (listing: Listing) => void;
@@ -115,24 +39,34 @@ export default function DemoMap({
 }: DemoMapProps) {
   const [listings, setListings] = useState<Listing[]>([]);
   const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Load listings from API
   useEffect(() => {
     const fetchListings = async () => {
       try {
+        setLoading(true);
+        setError(null);
+        
         const response = await fetch('/api/listings');
+        if (!response.ok) {
+          throw new Error('Failed to fetch listings');
+        }
+        
         const data = await response.json();
         
         if (data.listings) {
           setListings(data.listings);
         } else {
-          // Fallback to demo data if API fails
-          setListings(demoListings);
+          setListings([]);
         }
       } catch (error) {
         console.error('Error fetching listings:', error);
-        // Fallback to demo data
-        setListings(demoListings);
+        setError('Failed to load listings');
+        setListings([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -156,6 +90,28 @@ export default function DemoMap({
       minimumFractionDigits: 0,
     }).format(price);
   };
+
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+          <p className="text-gray-600">Yuklanmoqda...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-2">Xatolik yuz berdi</p>
+          <p className="text-gray-600 text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full">
