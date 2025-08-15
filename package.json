@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "bot": "node bot/index.js",
+    "bot:dev": "nodemon bot/index.js"
   },
   "dependencies": {
     "@playwright/test": "^1.54.2",
@@ -31,6 +33,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "nodemon": "^3.0.1"
   }
 }
