@@ -7,14 +7,19 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // Проверяем, что переменные окружения установлены
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase environment variables are required');
+  console.warn('⚠️ Supabase environment variables are not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env file.');
 }
 
 // Browser client для клиентской стороны
-export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createBrowserClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
 // Server client для API маршрутов
 export const createServerClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase environment variables are required');
+  }
   return createClient(supabaseUrl, supabaseAnonKey);
 };
 

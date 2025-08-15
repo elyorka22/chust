@@ -51,6 +51,9 @@ export default function DemoMap({
         
         const response = await fetch('/api/listings');
         if (!response.ok) {
+          if (response.status === 500) {
+            throw new Error('Database configuration not found. Please configure Supabase environment variables.');
+          }
           throw new Error('Failed to fetch listings');
         }
         
@@ -63,7 +66,7 @@ export default function DemoMap({
         }
       } catch (error) {
         console.error('Error fetching listings:', error);
-        setError('Failed to load listings');
+        setError(error instanceof Error ? error.message : 'Failed to load listings');
         setListings([]);
       } finally {
         setLoading(false);
@@ -105,9 +108,24 @@ export default function DemoMap({
   if (error) {
     return (
       <div className="w-full h-full flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-2">Xatolik yuz berdi</p>
-          <p className="text-gray-600 text-sm">{error}</p>
+        <div className="text-center max-w-md mx-auto p-4">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 className="text-yellow-800 font-medium mb-2">Database Configuration Required</h3>
+            <p className="text-yellow-700 text-sm mb-3">
+              {error.includes('Database configuration not found') 
+                ? 'To view listings, please configure your Supabase database connection.'
+                : error
+              }
+            </p>
+            <div className="text-xs text-yellow-600 bg-yellow-100 p-2 rounded">
+              <p className="font-medium mb-1">Setup instructions:</p>
+              <ol className="list-decimal list-inside space-y-1">
+                <li>Create a .env file in the project root</li>
+                <li>Add your Supabase URL and API key</li>
+                <li>Restart the development server</li>
+              </ol>
+            </div>
+          </div>
         </div>
       </div>
     );
