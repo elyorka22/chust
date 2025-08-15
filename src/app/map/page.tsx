@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useTelegramApp } from '@/hooks/useTelegramApp';
+import { useUser } from '@/hooks/useUser';
 import { Listing, Category } from '@/types';
 import CategoryFilter from '@/components/CategoryFilter';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus, User } from 'lucide-react';
 
 // Dynamic import of the map to avoid SSR issues
 const DemoMap = dynamic(() => import('@/components/DemoMap'), {
