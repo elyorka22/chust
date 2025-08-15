@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
         contact_phone: body.contact_phone,
         contact_email: null, // No email field anymore
         category_id: category.id,
-        user_id: 'demo_user', // TODO: Get from authenticated user session
+        user_id: 'a4207bec-8d62-4e6d-926e-f67a1b6f5ed6', // Use the created demo user ID
         is_active: true
       })
       .select()
